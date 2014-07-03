@@ -1,0 +1,121 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>GGV</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/tipsy.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/font-awesome-4.1.0/css/font-awesome.css">
+  <link rel="stylesheet" href="css/chosen.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div id="main" role="main">
+      <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      <h1 data-toggle="modal" data-target="#myModal" id='about'>Geography of Genetic Variants<br>Beta v0.1</h1> 
+
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">About</h4>
+            </div>
+            <div class="modal-body">
+              Welcome to the Geography of Genetic Variants (GGV) visualization. To begin pick
+              a dataset on the dropdown menu. One can search variants within a dataset by its position 
+              on a chromsome formatted by chromosome#:position ex. 15:24608502. Otherwise click
+              the rand button to show a random marker from the chosen dataset. One can also hover over a pie
+              chart to display the population name, minor allele frequencey, minor allele count, and sample size. Click on the position title to open up the UCSC genome broswer at that variant. Keep in mind that this 
+              is still a rough draft and many ideas/resources are in progress.<br><br> Questions/feedback/ideas/critques are welcomed and appreciated! Contact...
+              <br>
+              <br>
+              josephhmarcus at gmail dot com
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row' id='settings'>
+        <div id="dropDown" class='col-sm-4'>
+          <div id='datasets'>
+          </div>
+        </div>
+        <div class='col-sm-4'>
+          <div id='variant_settings'>
+            <div>
+              <form id='buttons' class='btn-group'>
+                <input id='search' type="text" class="form-control" placeholder='Search Variant'>
+                <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+                <button id='random' type='button' class="btn btn-default">rand</button>
+              </form> 
+            </div>
+          </div>
+        </div>
+        <div id="layouts" class='col-sm-4'>
+          <div class="btn-group">
+            <a id="true" class="btn btn-default">True Position</a>
+            <a id="charged" class="btn btn-default">Avoid Overlap</a>
+          </div>
+        </div>
+      </div>
+      <div id="vis">
+        <div id='variant'><h2></h2></div>
+      </div>
+      <div class="row" id='legend'>
+        <div id='freqLegend' class="col-sm-4">
+          <h3></h3>
+          <p></p>
+        </div>
+        <div id='transLegend' class="col-sm-4">
+          <h3></h3>
+          <p></p>
+        </div>
+        <div id='testLegend' class="col-sm-4">
+          <h3></h3>
+          <p></p>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <footer id='footer'>
+    <div id='text'>
+      <p><a href='http://jnpopgen.org/' target='_blank'>Novembre Lab</a><br>Developed by Joe Marcus and John Novembre<br>Department of Human Genetics, University of Chicago</p>
+    </div>
+  </footer>
+
+  <script src="js/jquery-1.11.0.js"></script>
+  <script src="js/colorbrewer.v1.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/jquery.tipsy.js"></script>
+  <script src="js/d3.v3.min.js"></script>
+  <script src="js/d3.geo.projection.v0.min.js"></script>
+  <script src="js/topojson.v1.min.js"></script>
+  <script src="js/chosen.jquery.js"></script>
+  <script type="text/javascript" src="js/vis.js"></script>
+  <script type="text/javascript">
+    
+  </script>
+  
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->  
+</body>
+</html>

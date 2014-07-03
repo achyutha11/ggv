@@ -1,0 +1,89 @@
+
+body{
+  font-family: 'Arvo', Georgia, Times, serif;
+  text-align: center;
+}
+
+h1{
+  font-size: 50px;
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 9px;
+  margin: 40px 0 20px;
+}
+
+h1:hover{
+  cursor: pointer;
+  opacity: .6;
+}
+
+.modal-dialog{
+  margin-top: 195px;
+}
+
+.modal-body{
+  text-align: left;
+}
+
+#vis {
+  width: 940px;
+  height: 500;
+  clear: both;
+  margin-top:40px;
+}
+
+#datasets{
+  margin-top:5px;
+}
+
+#dataset{
+  width:240px;
+}
+
+#dataLink{
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+#search{
+  width:150px;
+  float:left;
+}
+
+#submit{
+  margin-left: 10px;
+}
+
+.twitter-share-button{
+  position: absolute;
+  right: 10px;
+  top: 20px;
+}
+
+#ucscLink:link{
+  color:black;
+}
+
+#ucscLink:visited {
+  color:black;
+}
+
+#ucscLink:hover{
+  cursor: pointer;
+  opacity: .6;
+  text-decoration:none;
+}
+
+#legend{
+  margin-top:30px;
+}
+
+footer{
+  font-size:10px;
+  margin-top: 40px;
+  width:100%;
+  margin-bottom:20px;
+}
+
+footer #text{
+  margin-top:30px;
+}
