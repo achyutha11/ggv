@@ -436,7 +436,7 @@ $ ->
   d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>")
 
   # make the defualt plot 
-  d3.json 'http://marioni.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (error, data) =>
+  d3.json 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (error, data) =>
     plot('#vis', data)
 
   # default link 
@@ -459,14 +459,14 @@ $ ->
       $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank')
 
 
-    url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
+    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
     plot.updateMapSimple(dataset)
     plot.updateData(url)
     
   # random snp
   d3.select('#random').on "click", () ->
     dataset = $('#dataset').chosen().val()
-    url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
+    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
     plot.updateData(url)
 
   # search submit
@@ -477,7 +477,7 @@ $ ->
       variant = $('#search').val().split(':')
       chrom = variant[0]
       pos = variant[1]
-      url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
       plot.updateData(url)  
   
 

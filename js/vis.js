@@ -421,7 +421,7 @@
     })(this));
     $(".chosen").chosen();
     d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>");
-    d3.json('http://marioni.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (function(_this) {
+    d3.json('http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (function(_this) {
       return function(error, data) {
         return plot('#vis', data);
       };
@@ -443,14 +443,14 @@
       } else {
         $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
       }
-      url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
       plot.updateMapSimple(dataset);
       return plot.updateData(url);
     });
     d3.select('#random').on("click", function() {
       var dataset, url;
       dataset = $('#dataset').chosen().val();
-      url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
       return plot.updateData(url);
     });
     return $('#submit').click(function() {
@@ -462,7 +462,7 @@
         variant = $('#search').val().split(':');
         chrom = variant[0];
         pos = variant[1];
-        url = 'http://marioni.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
         return plot.updateData(url);
       }
     });
