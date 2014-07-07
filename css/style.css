@@ -5,10 +5,14 @@ body{
 }
 
 h1{
-  font-size: 50px;
+  font-size: 40px;
   border-bottom: 1px solid #eeeeee;
   padding-bottom: 9px;
   margin: 40px 0 20px;
+}
+
+#sub{
+  font-size: 30px;
 }
 
 h1:hover{
