@@ -2,7 +2,7 @@ root = exports ? this
 
 FreqMap = () ->
   # setup global paramters
-  
+
   # visulization parameters
   vis = null
   width = 960
@@ -39,7 +39,7 @@ FreqMap = () ->
   countries = null
   path = null
   currentDataset = '1000genomes_phase3'
-  
+
 
   freqMap = (selection, data) =>
     # intial projection settings
@@ -64,7 +64,7 @@ FreqMap = () ->
           "id": "sphere"
           "d": path
 
-    # map border 
+    # map border
     vis.append("use")
         .attr
           "xlink:href": "#sphere"
@@ -73,14 +73,14 @@ FreqMap = () ->
           'stroke-width': '3px'
         .classed("map-path", true)
 
-    # map ocean  
+    # map ocean
     vis.append("use")
         .attr
           "xlink:href": "#sphere"
           'fill': '#fff'
         .classed("map-path", true)
 
-    # map minor axis 
+    # map minor axis
     vis.append("path")
       .datum(graticule)
       .attr
@@ -108,14 +108,14 @@ FreqMap = () ->
   freqMap.updateData = (url) ->
     d3.json url, (error, data) ->
       if error
-      else      
+      else
         currentNodes = setupNodes(data)
         vis.selectAll('.node').remove()
         update()
 
   freqMap.updateMapSimple = (dataset) ->
     ###
-    country_raw = countries.features.filter (d) => 
+    country_raw = countries.features.filter (d) =>
       if d.id == 840
         d.id
     country = country_raw[0]
@@ -142,7 +142,7 @@ FreqMap = () ->
 
   # figure out projection tween for bounding box (not working)
   freqMap.updateMap = (view) ->
-    country_raw = countries.features.filter (d) => 
+    country_raw = countries.features.filter (d) =>
       if d.id == 156
         d.id
     country = country_raw[0]
@@ -154,17 +154,17 @@ FreqMap = () ->
     new_path = d3.geo.path().projection(new_projection)
     vis.selectAll('.map-path').attr('d', new_path)
 
-  # helper for updatemap for projection transitions 
+  # helper for updatemap for projection transitions
   projectionTween = (projection0, projection1) ->
     (d) =>
-      t = 0 
+      t = 0
       old_projection = d3.geo.projection(project).scale(1).translate([width / 2, height / 2])
       old_path = d3.geo.path().projection(old_projection)
 
       `function project(λ, φ) {`
       λ *= 180 / Math.PI
       φ *= 180 / Math.PI
-      p0 = projection0([λ, φ]) 
+      p0 = projection0([λ, φ])
       p1 = projection1([λ, φ])
       return [(1 - t) * p0[0] + t * p1[0], (1 - t) * -p0[1] + t * -p1[1]]
       `}`
@@ -173,7 +173,7 @@ FreqMap = () ->
         t = _
         old_path(d)
 
-  # update the nodes 
+  # update the nodes
   update = () ->
     # define nodes for layout
     force
@@ -182,7 +182,7 @@ FreqMap = () ->
 
     freqScale = currentNodes[0].freqScale
     minColor = colorScale(freqScale)
-    
+
     #change variant title
     coords = currentNodes[0].coord
     chr = coords.split(':')[0]
@@ -205,7 +205,7 @@ FreqMap = () ->
         "transform": (d) ->
           "translate(#{d.x},#{d.y})"
       .call(force.drag)
-      
+
     piePath = nodeG.selectAll("path")
         .data((d, i)  => pie([0,1]))
           .enter()
@@ -214,21 +214,21 @@ FreqMap = () ->
           .attr('class', 'nodePath')
           .each((d) => this._current = d)
           .attr
-            "fill": (d, i) => 
-              if i == 0 
+            "fill": (d, i) =>
+              if i == 0
                 minColor
-              else 
+              else
                 '#fdbf6f'
             "stroke": 'white'
             "stroke-width": '1.5px'
 
     #transitions
     piePath.data((d) => pie(d.af)).transition().duration(500).attrTween("d", arcTween)
-      .attr  
-        "opacity": (d, i, index) -> 
+      .attr
+        "opacity": (d, i, index) ->
             nobs = currentNodes[index].nobs
             opacityScale(nobs)
-   
+
     # tool tip (tipsy)
     $(".node").tipsy
       gravity: 'sw'
@@ -243,9 +243,9 @@ FreqMap = () ->
 
     node.exit().remove()
 
-    #freq scale legend 
-    $('#freqLegend h3').html("<p><i>Frequency Scale = Proportion out of #{ freqScale }</i><br>Colors used in pie chart also indicate frequency scale. ex. the pie below represents MAF = <span style='color:#{ minColor }'>#{ .25*freqScale }</span></p>").css('font-size', 12)
-    
+    #freq scale legend
+    $('#freqLegend h3').html("<p><i style='font-size:14px'>Frequency Scale = Proportion out of #{ freqScale }</i><br>Colors used in the pie chart also indicate frequency scale. ex. the pie below represents MAF = <span style='color:#{ minColor }'>#{ .25*freqScale }</span></p>").css('font-size', 12)
+
     legend = d3.select("#freqLegend").selectAll("svg")
       .data(legend_data)
       .enter().append("svg")
@@ -262,20 +262,20 @@ FreqMap = () ->
             .innerRadius(0)
             .outerRadius(16))
           .attr
-            "fill": (d, i) => 
-              if i == 0 
+            "fill": (d, i) =>
+              if i == 0
                 minColor
-              else 
+              else
                 '#fdbf6f'
             "stroke": 'white'
             "stroke-width": '1.5px'
             "class": 'legslice'
 
      d3.select('.legslice').transition().duration(800).attr
-            "fill": (d, i) => 
-              if i == 0 
+            "fill": (d, i) =>
+              if i == 0
                 minColor
-              else 
+              else
                 '#fdbf6f'
 
     #transparencey legend
@@ -296,10 +296,10 @@ FreqMap = () ->
             .innerRadius(0)
             .outerRadius(16))
           .attr
-            "fill": (d, i) => 
-              if i == 0 
+            "fill": (d, i) =>
+              if i == 0
                 '#1f78b4'
-              else 
+              else
                 '#fdbf6f'
             "stroke": 'white'
             "stroke-width": '1.5px'
@@ -315,7 +315,7 @@ FreqMap = () ->
 
     #another legend
     $('#testLegend h3').html('<p>More features are on the way...scaled circles as alternates to pie charts, computing a bounding box for regional datasets, pdf export for publication quality figures, and search by rsID or tables of markers. Contact us with any ideas!</p>').css('font-size', 12)
-         
+
   arcTween = (a) =>
     i = d3.interpolate(this._current, a)
     this._current = i(0)
@@ -381,7 +381,7 @@ FreqMap = () ->
       d.y += (d.lat - d.y) * alpha
       d.x += (d.lon - d.x) * alpha
 
-  # collision detection 
+  # collision detection
   collide = (node) ->
     r = node.radius + 16
     nx1 = node.x - r
@@ -409,21 +409,21 @@ activate = (group, link) ->
   d3.selectAll("##{group} a").classed("active", false)
   d3.select("##{group} ##{link}").classed("active", true)
 
-$ -> 
- 
+$ ->
+
   # test dropdown menu (will setup resource in api to return data like this)
   # example 9:691026
-  
+
   test_dd = [{'dataset':'1000genomes_phase3', 'build':'hg19', 'view': 'global'},
-             {'dataset':'hgdp', 'build':'hg18', 'view':'europe'}, 
+             {'dataset':'hgdp', 'build':'hg18', 'view':'europe'},
              {'dataset':'popres_euro', 'build':'hg18', 'view': 'europe'}
             ]
-  
 
-  
+
+
   # create plot
   plot = FreqMap()
-  
+
   # default layout
   activate("layouts", 'true')
 
@@ -435,14 +435,14 @@ $ ->
 
   d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>")
 
-  # make the defualt plot 
+  # make the defualt plot
   d3.json 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (error, data) =>
     plot('#vis', data)
 
-  # default link 
+  # default link
   $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank')
 
-  # toggle layout 
+  # toggle layout
   d3.selectAll("#layouts a").on "click", (d) ->
     newLayout = d3.select(this).attr("id")
     activate("layouts", newLayout)
@@ -454,7 +454,7 @@ $ ->
     if dataset == '1000genomes_phase3'
       $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank')
     else if dataset == 'hgdp'
-      $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/11954565").attr('target', '_blank')
+      $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank')
     else
       $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank')
 
@@ -462,7 +462,7 @@ $ ->
     url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
     plot.updateMapSimple(dataset)
     plot.updateData(url)
-    
+
   # random snp
   d3.select('#random').on "click", () ->
     dataset = $('#dataset').chosen().val()
@@ -478,8 +478,8 @@ $ ->
       chrom = variant[0]
       pos = variant[1]
       url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
-      plot.updateData(url)  
-  
+      plot.updateData(url)
+
 
 
 
