@@ -15,13 +15,22 @@ h1{
   font-size: 28px;
 }
 
-h2{
-  font-size: 28px
+#cc{
+  width: 60px;
+  height:auto;
 }
 
-h1:hover{
-  cursor: pointer;
-  opacity: .6;
+.transSvg{
+  margin-top:20px;
+}
+
+#about{
+    margin-bottom:20px;
+}
+
+
+h2{
+  font-size: 28px
 }
 
 .modal-dialog{

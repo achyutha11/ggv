@@ -29,7 +29,8 @@
     <div id="main" role="main">
       <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-      <h1 data-toggle="modal" data-target="#myModal" id='about'>Geography of Genetic Variants Browser<p id='sub'>Beta v0.1</p></h1> 
+      <h1>Geography of Genetic Variants Browser<p id='sub'>Beta v0.1</p></h1> 
+      <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About/Help</p></a>
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -38,15 +39,20 @@
               <h4 class="modal-title" id="myModalLabel">About</h4>
             </div>
             <div class="modal-body">
-              Welcome to the Geography of Genetic Variants (GGV) browser. To begin, pick
+              Welcome to the Geography of Genetic Variants (GGV) browser! <br><br> To begin, pick
               a dataset on the dropdown menu. One can search variants within a dataset by its position 
-              on a chromsome formatted by chromosome#:position ex. 15:24608502. Otherwise click
-              the rand button to show a random marker from the chosen dataset. One can also hover over a pie
-              chart to display the population name, minor allele frequency, minor allele count, and sample size. Click on the position title to open up the UCSC genome browser at that variant. Keep in mind that this 
-              is still a rough draft and many ideas/resources are in progress.<br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! Contact...
-              <br>
-              <br>
-              josephhmarcus at gmail dot com
+              (Use the format chromosome#:position, as in, 15:24608502). Otherwise click
+              the "random" button to show a random marker from the chosen dataset. One can also hover over a pie
+              chart to display the population name, minor allele frequency, minor allele count, and sample size. Click on the position title to open up the UCSC genome browser at that variant. 
+<br><br>Be sure to note we use a notion of a "frequency scale" to display rare variants.  This is explained in the lower left with a legend.
+              <br><br>
+              If you use the maps in other works, include the source link: <a href=http://www.popgen.uchicago.edu/ggv/>http://www.popgen.uchicago.edu/ggv</a>
+              and/or make a formal reference to:<br> <i>JH Marcus and J Novembre.  Geography of Genetic Variants Browser v0.1. http://www.popgen.uchicago/ggv/</i>.
+<br><br>Keep in mind that this 
+              is still a rough draft and many ideas/resources are in progress.
+ 	      <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com
+              <br><br>
+
             </div>
           </div>
         </div>
@@ -62,7 +68,7 @@
               <form id='buttons' class='btn-group'>
                 <input id='search' type="text" class="form-control" placeholder='chr#:pos'>
                 <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
-                <button id='random' type='button' class="btn btn-default">rand</button>
+                <button id='random' type='button' class="btn btn-default">random</button>
               </form> 
             </div>
           </div>
@@ -96,6 +102,7 @@
   <footer id='footer'>
     <div id='text'>
       <p><a href='http://jnpopgen.org/' target='_blank'>Novembre Lab</a><br>Developed by Joe Marcus and John Novembre<br>Department of Human Genetics, University of Chicago</p>
+      <a href="http://creativecommons.org/licenses/by/4.0/"><img src='data/by.png' id='cc'></a>
     </div>
   </footer>
 
