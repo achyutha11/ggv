@@ -469,46 +469,16 @@ $ ->
     url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
     plot.updateData(url)
 
-  # search submit enter 
-  $('#buttons').keyup (e) ->
-      if e.which == 13
-        if $('#search').val() == ''
-        else
-          dataset = $('#dataset').chosen().val()
-          variant = $('#search').val().split(':')
-          if variant[0].substring(0,3) == 'chr'
-            chrom = variant[0].substring(3)
-            pos = variant[1]
-            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
-            plot.updateData(url)
-          else
-            chrom = variant[0]
-            pos = variant[1]
-            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
-            plot.updateData(url)
-
   # search submit
   $('#submit').click () ->
     if $('#search').val() == ''
     else
       dataset = $('#dataset').chosen().val()
       variant = $('#search').val().split(':')
-      if variant[0].substring(0,3) == 'chr'
-        chrom = variant[0].substring(3)
-        pos = variant[1]
-        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
-        plot.updateData(url)
-      else
-        chrom = variant[0]
-        pos = variant[1]
-        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
-        plot.updateData(url)
-
-
-
-
-
-
+      chrom = variant[0]
+      pos = variant[1]
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
+      plot.updateData(url)
 
 
 
