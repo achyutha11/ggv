@@ -252,7 +252,7 @@ FreqMap = () ->
           .attr("width", radius+50)
           .attr("height", radius+50)
           .append("g")
-            .attr("transform", "translate(#{ radius + 10}, #{ radius + 20})")
+            .attr("transform", "translate(#{ radius + 10}, #{ radius + 6})")
             .attr('class', 'legendSvg')
 
     legend.selectAll("path")
@@ -412,13 +412,11 @@ activate = (group, link) ->
 $ ->
 
   # test dropdown menu (will setup resource in api to return data like this)
-  # example 9:691026
 
   test_dd = [{'dataset':'1000genomes_phase3', 'build':'hg19', 'view': 'global'},
              {'dataset':'hgdp', 'build':'hg18', 'view':'europe'},
              {'dataset':'popres_euro', 'build':'hg18', 'view': 'europe'}
             ]
-
 
 
   # create plot
@@ -457,7 +455,6 @@ $ ->
       $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank')
     else
       $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank')
-
 
     url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
     plot.updateMapSimple(dataset)

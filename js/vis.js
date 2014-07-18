@@ -220,7 +220,7 @@
       });
       node.exit().remove();
       $('#freqLegend h3').html("<p><i style='font-size:14px'>Frequency Scale = Proportion out of " + freqScale + "</i><br>Colors used in the pie chart also indicate frequency scale. ex. the pie below represents MAF = <span style='color:" + minColor + "'>" + (.25 * freqScale) + "</span></p>").css('font-size', 12);
-      legend = d3.select("#freqLegend").selectAll("svg").data(legend_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 20) + ")").attr('class', 'legendSvg');
+      legend = d3.select("#freqLegend").selectAll("svg").data(legend_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 6) + ")").attr('class', 'legendSvg');
       legend.selectAll("path").data(pie).enter().append("path").attr("d", d3.svg.arc().innerRadius(0).outerRadius(16)).attr({
         "fill": (function(_this) {
           return function(d, i) {
