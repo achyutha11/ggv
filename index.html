@@ -40,7 +40,7 @@
             </div>
             <div class="modal-body">
               Welcome to the Geography of Genetic Variants (GGV) browser! <br><br> To begin, pick
-              a dataset on the dropdown menu. One can search variants within a dataset by its position 
+              a dataset on the dropdown menu. One can search variants within a dataset by its rsID or position 
               (Use the format chromosome#:position, as in, 15:24608502 or chr15:24608502) and clicking the search button or the enter key. Otherwise click
               the "random" button to show a random marker from the chosen dataset. One can also hover over a pie
               chart to display the population name, minor allele frequency, minor allele count, and sample size. Click on the position title to open up the UCSC genome browser at that variant. 
@@ -66,7 +66,7 @@
           <div id='variant_settings'>
             <div>
               <form id='buttons' class='btn-group' onSubmit="return false;">
-                <input id='search' type="text" class="form-control" placeholder='chr#:pos'>
+                <input id='search' type="text" class="form-control" placeholder='rsID/chr#:pos'>
                 <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
                 <button id='random' type='button' class="btn btn-default">random</button>
               </form> 
