@@ -454,14 +454,18 @@
       return plot.updateData(url);
     });
     $('#buttons').keyup(function(e) {
-      var chrom, dataset, pos, url, variant;
+      var chrom, dataset, pos, rsID, url, variant;
       if (e.which === 13) {
         if ($('#search').val() === '') {
 
         } else {
           dataset = $('#dataset').chosen().val();
           variant = $('#search').val().split(':');
-          if (variant[0].substring(0, 3) === 'chr') {
+          if ($('#search').val().substring(0, 2) === 'rs') {
+            rsID = $('#search').val();
+            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
+            return plot.updateData(url);
+          } else if (variant[0].substring(0, 3) === 'chr') {
             chrom = variant[0].substring(3);
             pos = variant[1];
             url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
@@ -476,13 +480,17 @@
       }
     });
     return $('#submit').click(function() {
-      var chrom, dataset, pos, url, variant;
+      var chrom, dataset, pos, rsID, url, variant;
       if ($('#search').val() === '') {
 
       } else {
         dataset = $('#dataset').chosen().val();
         variant = $('#search').val().split(':');
-        if (variant[0].substring(0, 3) === 'chr') {
+        if ($('#search').val().substring(0, 2) === 'rs') {
+          rsID = $('#search').val();
+          url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
+          return plot.updateData(url);
+        } else if (variant[0].substring(0, 3) === 'chr') {
           chrom = variant[0].substring(3);
           pos = variant[1];
           url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
