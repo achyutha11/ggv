@@ -108,6 +108,13 @@ FreqMap = () ->
   freqMap.updateData = (url) ->
     d3.json url, (error, data) ->
       if error
+        currentDataset = $('#dataset').chosen().val()
+        $("#alert").modal('show')
+        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+currentDataset+'_table"&random_snp=True'
+        d3.json url, (error, data) ->
+          currentNodes = setupNodes(data)
+          vis.selectAll('.node').remove()
+          update()
       else
         currentNodes = setupNodes(data)
         vis.selectAll('.node').remove()
@@ -350,6 +357,9 @@ FreqMap = () ->
     setLayout(newLayout)
     update()
 
+  freqMap.getCurrentNodes = () ->
+    return currentNodes
+
   # set the layout based on buttons
   setLayout = (newLayout) ->
     layout = newLayout
@@ -456,7 +466,10 @@ $ ->
     else
       $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank')
 
-    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&random_snp=True'
+    currentCoord = plot.getCurrentNodes()[0].coord.split(':')
+    chrom = currentCoord[0]
+    pos = currentCoord[1]
+    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
     plot.updateMapSimple(dataset)
     plot.updateData(url)
 

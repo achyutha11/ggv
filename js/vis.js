@@ -76,7 +76,14 @@
     freqMap.updateData = function(url) {
       return d3.json(url, function(error, data) {
         if (error) {
-
+          currentDataset = $('#dataset').chosen().val();
+          $("#alert").modal('show');
+          url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
+          return d3.json(url, function(error, data) {
+            currentNodes = setupNodes(data);
+            vis.selectAll('.node').remove();
+            return update();
+          });
         } else {
           currentNodes = setupNodes(data);
           vis.selectAll('.node').remove();
@@ -315,6 +322,9 @@
       setLayout(newLayout);
       return update();
     };
+    freqMap.getCurrentNodes = function() {
+      return currentNodes;
+    };
     setLayout = function(newLayout) {
       var layout;
       layout = newLayout;
@@ -434,7 +444,7 @@
       return plot.toggleLayout(newLayout);
     });
     $('#dataset').chosen().change(function() {
-      var dataset, url;
+      var chrom, currentCoord, dataset, pos, url;
       dataset = $('#dataset').chosen().val();
       if (dataset === '1000genomes_phase3') {
         $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
@@ -443,7 +453,10 @@
       } else {
         $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
       }
-      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+      currentCoord = plot.getCurrentNodes()[0].coord.split(':');
+      chrom = currentCoord[0];
+      pos = currentCoord[1];
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
       plot.updateMapSimple(dataset);
       return plot.updateData(url);
     });

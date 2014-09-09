@@ -17,6 +17,7 @@
   <link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="css/tipsy.css">
   <link rel="stylesheet" href="css/bootstrap.css">
+  <!--<link rel="stylesheet" href="css/Flat-UI-master/css/flat-ui.css">!-->
   <link rel="stylesheet" href="css/font-awesome-4.1.0/css/font-awesome.css">
   <link rel="stylesheet" href="css/chosen.css">
   <link rel="stylesheet" href="css/style.css">
@@ -29,7 +30,7 @@
     <div id="main" role="main">
       <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-      <h1>Geography of Genetic Variants Browser<p id='sub'>Beta v0.1</p></h1> 
+      <h1>Geography of Genetic Variants Browser<p id='sub'>Beta v0.1</p></h1>       
       <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About/Help</p></a>
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -80,6 +81,27 @@
           </div>
         </div>
       </div>
+
+      <div class="modal fade" id="alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle"></i> Error!</h4>
+            </div>
+            <div class="modal-body">
+              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. Acceptable searchs by chromosome/pos or rsID look like...<br><br>
+              chr1:742429 
+              <br>
+              1:742429 
+              <br>
+              rs3094315
+              <br>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="vis">
         <div id='variant'><h2></h2></div>
       </div>
