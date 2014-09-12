@@ -490,7 +490,6 @@ $ ->
             rsID = $('#search').val()
             url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&rsID='+rsID
             plot.updateData(url)
-
           else if variant[0].substring(0,3) == 'chr'
             chrom = variant[0].substring(3)
             pos = variant[1]
