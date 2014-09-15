@@ -32,7 +32,6 @@ h1{
   cursor:pointer;
 }
 
-
 h2{
   font-size: 28px
 }
@@ -43,6 +42,11 @@ h2{
 
 .modal-body{
   text-align: left;
+}
+
+#slider-holder{
+  margin-top: 40px;
+  margin-bottom: 0px;
 }
 
 #vis {

@@ -523,6 +523,21 @@ $ ->
         url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
         plot.updateData(url)
 
+  $('#submitArea').click () ->
+    dataTable = $('#snp_col').val().split('\n') 
+    sizes = ["0","2","4","6","8","10","12","14","16","18","16W","18W","20W"]
+    $('#slider').slider () ->
+      min: 0
+      max: sizes.length - 1
+      step: 1
+      slide: (event, ui) ->
+        $(".rsize").text(sizes[ui.value])
+        console.log 'test'
+
+
+    console.log(dataTable)
+
+
 
 
 

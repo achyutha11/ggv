@@ -492,7 +492,7 @@
         }
       }
     });
-    return $('#submit').click(function() {
+    $('#submit').click(function() {
       var chrom, dataset, pos, rsID, url, variant;
       if ($('#search').val() === '') {
 
@@ -515,6 +515,23 @@
           return plot.updateData(url);
         }
       }
+    });
+    return $('#submitArea').click(function() {
+      var dataTable, sizes;
+      dataTable = $('#snp_col').val().split('\n');
+      sizes = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "16W", "18W", "20W"];
+      $('#slider').slider(function() {
+        return {
+          min: 0,
+          max: sizes.length - 1,
+          step: 1,
+          slide: function(event, ui) {
+            $(".rsize").text(sizes[ui.value]);
+            return console.log('test');
+          }
+        };
+      });
+      return console.log(dataTable);
     });
   });
 
