@@ -47,13 +47,26 @@ h2{
 #slider-holder{
   margin-top: 40px;
   margin-bottom: 0px;
+  margin-left: 20px;
+}
+
+#slider{
+  width:240px;
+}
+
+#submitArea{
+  margin-top: 20px;
+}
+
+#snp_col{
+  margin-top: 20px;
 }
 
 #vis {
   width: 940px;
   height: 500;
   clear: both;
-  margin-top:40px;
+  margin-top:15px;
 }
 
 #datasets{

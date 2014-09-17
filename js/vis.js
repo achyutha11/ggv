@@ -517,21 +517,35 @@
       }
     });
     return $('#submitArea').click(function() {
-      var dataTable, sizes;
+      var dataTable;
       dataTable = $('#snp_col').val().split('\n');
-      sizes = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "16W", "18W", "20W"];
-      $('#slider').slider(function() {
-        return {
-          min: 0,
-          max: sizes.length - 1,
-          step: 1,
-          slide: function(event, ui) {
-            $(".rsize").text(sizes[ui.value]);
-            return console.log('test');
-          }
-        };
-      });
-      return console.log(dataTable);
+      return $( "#slider" ).slider({
+      min: 0,
+      max: dataTable.length - 1,
+      step: 1,
+      slide: function( event, ui ) {
+        dataset = $('#dataset').chosen().val()
+        if ( dataTable[ui.value].substring(0,2) == 'rs' ) {
+           rsID = dataTable[ui.value]
+           url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&rsID='+rsID
+           plot.updateData(url);
+        }
+        else if (dataTable[ui.value].substring(0,3) == 'chr') {
+          variant = dataTable[ui.value].split(':')
+          chrom = variant[0].substring(3)
+          pos = variant[1]
+          url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
+          plot.updateData(url);
+        }
+        else {
+          variant = dataTable[ui.value].split(':')
+          chrom = variant[0]
+          pos = variant[1]
+          url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+dataset+'_table"&chr='+chrom+'&pos='+pos
+          plot.updateData(url);
+        }
+      }
+    });;
     });
   });
 
