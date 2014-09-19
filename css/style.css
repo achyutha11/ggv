@@ -45,13 +45,20 @@ h2{
 }
 
 #slider-holder{
-  margin-top: 35px;
+  margin-top: 30px;
   margin-bottom: 0px;
   margin-left: 20px;
 }
 
 #slider{
-  width:240px;
+  width:239px;
+  margin-bottom:5px;
+  float:left;
+  margin-left:327px;
+}
+
+#arrows{
+  float:left;
 }
 
 #submitArea{
