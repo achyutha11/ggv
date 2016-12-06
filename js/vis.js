@@ -8,8 +8,8 @@
   FreqMap = function() {
     var arc, arcTween, charge, collide, colorScale, countries, currentDataset, currentNodes, currentLinks, force, freqMap, height, legend_data, majColor, minColor, moveToPoint, node, nodeG, opacityScale, path, pie, pies, projection, projectionTween, radius, radiusScale, setLayout, setupNodes, tick, tickCharged, trans_data, update, vis, width;
     vis = null;
-    width = 960;
-    height = 500;
+    width = 635;  // 960
+    height = 425; // 500
     currentNodes = [];
     currentLinks = [];
     node = null;
@@ -24,7 +24,7 @@
     pies = null;
     pie = d3.layout.pie().startAngle(5 * Math.PI / 2).endAngle(Math.PI / 2).sort(null);
     arc = d3.svg.arc().innerRadius(0).outerRadius(radius);
-    colorScale = d3.scale.ordinal().domain([1, .1, .01, .001]).range(['#1f78b4', '#33a02c', '#e31a1c', '#6a3d9a']);
+    colorScale = d3.scale.ordinal().domain([1, .1, .01, .001,0.001]).range(['#1f78b4', '#33a02c', '#e31a1c', '#6a3d9a','#663300']);
     minColor = null;
     majColor = '#fdbf6f';
     legend_data = [[.25, .75]];
@@ -38,7 +38,7 @@
     freqMap = (function(_this) {
       return function(selection, data) {
         var graticule;
-        projection = d3.geo.kavrayskiy7().rotate([-155, 0, 0]).clipExtent([[3, 3], [width - 3, height - 3]]).scale(150).translate([width / 2, height / 2]);
+        projection = d3.geo.kavrayskiy7().rotate([-155, 0, 0]).clipExtent([[3, 3], [width - 3, height - 3]]).scale(120).translate([width / 2, height / 2]);
         path = d3.geo.path().projection(projection);
         graticule = d3.geo.graticule();
         currentNodes = setupNodes(data);
@@ -84,23 +84,23 @@
       };
     })(this);
 
-    // updates dthe data shown on the page
+    // updates the data shown on the page
     freqMap.updateData = function(url) {
       console.log('updatedata');
       return d3.json(url, function(error, data) {
         console.log(data);
         if (error) {
           currentDataset = $('#dataset').chosen().val();
-          // $("#alert").modal('show');
-          url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
-          return d3.json(url, function(error, data) {
-            currentNodes = setupNodes(data);
-            currentLinks = setupLinks(currentNodes);
-            vis.selectAll('.node').remove();
-            console.log('currentNodes');
-            console.log(currentNodes);
-            return update();
-          });
+          $("#alert").modal('show');
+          //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
+          //return d3.json(url, function(error, data) {
+          //  currentNodes = setupNodes(data);
+          //  currentLinks = setupLinks(currentNodes);
+          //  vis.selectAll('.node').remove();
+          //  console.log('currentNodes');
+          //  console.log(currentNodes);
+          //  return update();
+          //});
         } else {
           currentNodes = setupNodes(data);
           currentLinks = setupLinks(currentNodes);
@@ -133,15 +133,20 @@
        $(document).trigger("datasetChange", [dataset, currentDataset]);
       if (dataset === '1000genomes_phase3') {
         vis.selectAll('.map-path-50').remove();
-        projection.scale(150).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
+        projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
         vis.selectAll('.map-path').attr('d', path);
         return currentDataset = dataset;
-      } else if (dataset === 'hgdp') {
+      } else if (dataset === '1000genomes_superpops_phase3') {
         vis.selectAll('.map-path-50').remove();
-        projection.scale(150).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
+        projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
         vis.selectAll('.map-path').attr('d', path);
         return currentDataset = dataset;
-      } else {
+      } else if (dataset === 'HGDP') {
+        vis.selectAll('.map-path-50').remove();
+        projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
+        vis.selectAll('.map-path').attr('d', path);
+        return currentDataset = dataset;
+      } else if(dataset == 'POPRES_Euro'){
         projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
         console.log(path);
 
@@ -157,8 +162,10 @@
           });
 
         })
-
-
+      } else {
+        vis.selectAll('.map-path-50').remove();
+        projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
+        vis.selectAll('.map-path').attr('d', path);
         return currentDataset = dataset;
       }
     };
@@ -303,7 +310,7 @@
         }
       });
       node.exit().remove();
-      $('#freqLegend h3').html("<p><i style='font-size:14px'>Frequency Scale = Proportion out of " + freqScale + "</i><br>Colors used in the pie chart also indicate frequency scale. ex. the pie below represents MAF = <span style='color:" + minColor + "'>" + (.25 * freqScale) + "</span></p>").css('font-size', 12);
+      $('#freqLegend h3').html("<p><i style='font-size:14px'>Frequency Scale = Proportion out of " + freqScale + "</i><br>The pie below represents a minor allele frequency of <span style='color:" + minColor + "'>" + (.25 * freqScale) + "</span></p>").css('font-size', 12);
       legend = d3.select("#freqLegend").selectAll("svg").data(legend_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 6) + ")").attr('class', 'legendSvg');
       legend.selectAll("path").data(pie).enter().append("path").attr("d", d3.svg.arc().innerRadius(0).outerRadius(16)).attr({
         "fill": (function(_this) {
@@ -330,7 +337,7 @@
           };
         })(this)
       });
-      $('#transLegend h3').html('<p>Sample sizes below 30 chromosomes become increasingly transparent to represent uncertain allele frequencies i.e.</p>').css('font-size', 12);
+      $('#transLegend h3').html('<p>Sample sizes below 30 become increasingly transparent to represent uncertain frequencies, i.e.</p>').css('font-size', 12);
       trans_legend = d3.select("#transLegend").selectAll("svg").data(trans_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 20) + ")").attr('class', 'transSvg');
       trans_legend.selectAll("path").data(pie).enter().append("path").attr("d", d3.svg.arc().innerRadius(0).outerRadius(16)).attr({
         "fill": (function(_this) {
@@ -358,7 +365,7 @@
       })(this)).attr({
         'font-size': '11px'
       });
-      return $('#testLegend h3').html('<p>More features are on the way...scaled circles as alternates to pie charts, computing a bounding box for regional datasets, pdf export for publication quality figures, and search by rsID or tables of markers. Contact us with any ideas!</p>').css('font-size', 12);
+      return $('#testLegend h3').html('<p>Please reference:</p><p>Marcus & Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="http://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"> <i id="linkIcon" class="fa fa-external-link"></i></a></p><p>Version: 0.4 (beta)</p><p>Funding provided by <a href="https://datascience.nih.gov/bd2k">NIH BD2K Program.</a></p>').css('font-size', 12);
     };
     arcTween = (function(_this) {
       return function(a) {
@@ -582,19 +589,28 @@
     var dropDown, options, plot, test_dd, schemes, locations, schemeOpts;
     test_dd = [
       {
-        'dataset': '1000genomes_phase3',
+        'dataset': '1000genomes',
         'build': 'hg19',
         'view': 'global'
       }, {
-        'dataset': 'hgdp',
-        'build': 'hg18',
-        'view': 'europe'
+        'dataset': '1000genomes_superpops',
+        'build': 'hg19',
+        'view': 'global'
       }, {
-        'dataset': 'popres_euro',
-        'build': 'hg18',
+        'dataset': 'ExAC',
+        'build': 'hg19',
+        'view': 'global'
+      }, {
+        'dataset': 'POPRES_Euro',
+        'build': 'hg19',
         'view': 'europe'
       }
     ];
+    //{
+    ///    'dataset': 'HGDPimputedto1000genomes',
+    //    'build': 'hg19',
+    //    'view': 'global'
+    //  }
     plot = FreqMap();
     activate("layouts", 'true');
     dropDown = d3.select("#datasets").append("select").attr("id", "dataset").attr('class', 'chosen');
@@ -611,10 +627,11 @@
     $(".chosen").chosen();
 
     d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>");
-    d3.json('http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_phase3_table"&random_snp=True', (function(_this) {
+    d3.json('http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833', (function(_this) {
       return function(error, data) {
         console.log('i don\'t know where this is');
         console.log(data);
+
         return plot('#vis', data);
       };
     })(this));
@@ -628,17 +645,23 @@
     $('#dataset').chosen().change(function() {
       var chrom, currentCoord, dataset, pos, url;
       dataset = $('#dataset').chosen().val();
-      if (dataset === '1000genomes_phase3') {
+      if (dataset === '1000genomes') {
         $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
-      } else if (dataset === 'hgdp') {
+      } else if (dataset === '1000genomes_superpops') {
+        $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
+      } else if (dataset === 'HGDP') {
         $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
-      } else {
+      } else if (dataset === 'HGDPimputedto1000genomes') {
+	$('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
+      } else if (dataset === 'ExAC') {
+        $('#dataLink').attr("href", "http://exac.broadinstitute.org").attr('target', '_blank');
+      } else if (dataset === 'POPRES_Euro') {
         $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
       }
       currentCoord = plot.getCurrentNodes()[0].coord.split(':');
       chrom = currentCoord[0];
       pos = currentCoord[1];
-      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+      url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
       plot.updateMapSimple(dataset);
       return plot.updateData(url);
     });
@@ -746,7 +769,8 @@
     newPDF = function() {
       var doc, sphere, paths, lines, landmass, stream, xml, xml2, arrayBuffer;
 
-      doc = new PDFDocument({size:[612,450],margins:{top:0,bottom:0,left:0,right:0}});
+      //doc = new PDFDocument({size:[612,450],margins:{top:0,bottom:0,left:0,right:0}});
+      doc = new PDFDocument({size:[480,400],margins:{top:0,bottom:0,left:0,right:0}});
       stream = doc.pipe(blobStream());
 
       // load fonts
@@ -781,7 +805,8 @@
         landmass = paths[0][3];
       }
 
-      doc.scale(.5).translate(100,130).path($(sphere).attr('d')).stroke('black');
+      // position of map in pdf in translate(250,130)
+      doc.scale(.5).translate(160,130).path($(sphere).attr('d')).stroke('black');
       doc.path($(lines).attr('d')).strokeColor("#d2d2d2",0.5).lineWidth(0.3).stroke();
       doc.path($(landmass).attr('d')).fillColor('#AAAAAA').fill();
 
@@ -797,8 +822,8 @@
         for(i=0;i<3;i++){
           allele1Color[i] = allele1Color[i].replace(/\D/g,'');
         }
-
-        doc.scale(2).fillColor('black').font('Arvo-Regular').text($(chromosome).text()+' ',175,-15,{continued:true}).fillColor(allele1Color).text($(allele1).text(),{continued:true}).fillColor('black').text('/',{continued:true}).fillColor('#fdbf6f').text($(allele2).text()).scale(.5);
+        // position of header
+        doc.scale(2).fillColor('black').font('Arvo-Regular').text($(chromosome).text()+' ',100,-15,{continued:true}).fillColor(allele1Color).text($(allele1).text(),{continued:true}).fillColor('black').text('/',{continued:true}).fillColor('#fdbf6f').text($(allele2).text()).scale(.5);
 
         var nodes = d3.selectAll('#svg_image g');
         nodes = nodes[0];
@@ -845,28 +870,30 @@
         $('br',freqLegend).remove();
         $('span',freqLegend).remove();
 
-        doc.scale(2).fontSize(8).fillColor('black').font('Arvo-Italic').text(freqLegendi,30,270);
-        doc.fontSize(7).font('Arvo-Regular').text($.trim(freqLegend.text()+' '+freqLegendSpan.text()),0,280,{width:215,align:'center'});
+        // position of legend
+	var legendheight=210
+        doc.scale(2).fontSize(8).fillColor('black').font('Arvo-Italic').text(freqLegendi,-32,legendheight);
+        doc.fontSize(7).font('Arvo-Regular').text($.trim(freqLegend.text()+' '+freqLegendSpan.text()),-70,legendheight+10,{width:215,align:'center'});
 
-        doc.translate(100,310).scale(0.5).path("M0,-16A16,16 0 0,1 16,0L0,0Z").fillColor(fLSColor).strokeColor('white').fillAndStroke();
-        doc.path("M16,0A16,16 0 1,1 -2.9391523179536475e-15,-16L0,0Z").fillColor('#fdbf6f').strokeColor('white').fillAndStroke().scale(2).translate(-103,-310);
+        doc.translate(30,legendheight+40).scale(0.5).path("M0,-16A16,16 0 0,1 16,0L0,0Z").fillColor(fLSColor).strokeColor('white').fillAndStroke();
+        doc.path("M16,0A16,16 0 1,1 -2.9391523179536475e-15,-16L0,0Z").fillColor('#fdbf6f').strokeColor('white').fillAndStroke().scale(2).translate(-103,-legendheight-40);
 
         // TRANS LEGEND
         var transLegend, transOpacity;
         transLegend = $('#transLegend h3 p').text();
-        doc.fillColor('black').text(transLegend,250,270,{width:220,align:'center'});
+        doc.fillColor('black').text(transLegend,250,legendheight,{width:220,align:'center'});
         transOpacity = [0.1436531757746151,0.6126936484507698,0.8069765735351202,0.9560551052558368];
 
-        doc.translate(300,310).scale(0.5);
+        doc.translate(310,legendheight+40).scale(0.5);
         for(i=0;i<4;i++){
           doc.path("M0,-16A16,16 0 0,1 16,0L0,0Z").fillColor('#1f78b4',transOpacity[i]).strokeColor('white',transOpacity[i]).fillAndStroke();
           doc.path("M16,0A16,16 0 1,1 -2.9391523179536475e-15,-16L0,0Z").fillColor('#fdbf6f',transOpacity[i]).strokeColor('white',transOpacity[i]).fillAndStroke().translate(65,0);//.translate(-210,-620);
         }
 
         doc.translate(-65*4,0).scale(2).translate(-300,-310).fillColor('black').text('0',295,305);
-        doc.text('9',327,305);
-        doc.text('18',358,305);
-        doc.text('27',390,305);
+        doc.text('n=9',327,305);
+        doc.text('n=18',358,305);
+        doc.text('n=27',390,305);
 
         console.log('end');
         doc.end();
@@ -899,6 +926,9 @@
     var browserdiv = document.getElementById("browserContainer");
     // options for browser
     var options = {
+	
+	    locus : '1:222087783-222087883',
+
             reference: {
                 id: "hg19",
                 fastaURL: "//igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
@@ -914,27 +944,24 @@
             },
 
             tracks: [
-                {
-                    name: "Genes",
-                    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-                    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-                    displayMode: "EXPANDED",
-                    color: "#aaaaaa",
-                    order: 0
-                },
-
-                {
-                    name: "Variants",
-                    format: "vcf",
-                    url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-                    indexURL:  "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
-                    type: "variant",
-                    color: "#aaaaaa",
-                    order: 1
-                }
-
+		{
+		    name: "Genes",
+		    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+		    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+		    displayMode: "EXPANDED",
+		    color: "#aaaaaa",
+		    order: 0
+		},
+		{
+		    name: "Variants",
+		    format: "vcf",
+		    url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
+		    indexURL:  "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
+		    type: "variant",
+		    color: "#aaaaaa",
+		    order: 1
+		}
             ]
-
         };
 
 
@@ -960,12 +987,12 @@
       console.log($('#ucscLink').text());
 
       if(x >= 5000) {
-        xleft = x - 5000;
-        xright = x + 5000;
+        xleft = x - 100;
+        xright = x + 100;
       }
       else {
         xleft = 0;
-        xright = 5000;
+        xright = 200;
       }
 
       // this inputs the window into the IGV search bar
@@ -1010,6 +1037,26 @@
           order: 1
       }
     ];
+    
+    var exacTracks = [
+      {
+          name: "Genes",
+          url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+          index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+          displayMode: "EXPANDED",
+          color: "#aaaaaa",
+          order: 0
+      },
+      {
+          name: "Variants",
+          format: "vcf",
+          url: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
+          indexURL:  "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
+          type: "variant",
+          color: "#aaaaaa",
+          order: 1
+      }
+    ];
 
     var hgdpTracks = [
       {
@@ -1023,8 +1070,8 @@
       {
           name: "Variants",
           format: "vcf",
-          url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-          indexURL:  "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
+          url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
+          indexURL:  "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
           type: "variant",
           color: "#aaaaaa",
           order: 1
@@ -1043,8 +1090,8 @@
       {
           name: "Variants",
           format: "vcf",
-          url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-          indexURL:  "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
+          url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
+          indexURL:  "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
           type: "variant",
           color: "#aaaaaa",
           order: 1
@@ -1064,11 +1111,14 @@
       browser.removeTrack(browser.trackViews[2].track); // variants track
 
       // sets the tracks to the new track info
-      if(newDataset == 'hgdp') {
+      if(newDataset == 'HGDP') {
         var tracks = hgdpTracks;
       }
-      else if(newDataset == 'popres_euro'){
+      else if(newDataset == 'POPRES_Euro'){
         var tracks = popresTracks;
+      }
+      else if(newDataset == 'ExAC'){
+        var tracks = exacTracks;
       }
       else {
         var tracks = oneThousandTracks;

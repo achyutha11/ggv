@@ -5,14 +5,14 @@ body{
 }
 
 h1{
-  font-size: 40px;
+  font-size: 28px;
   border-bottom: 1px solid #eeeeee;
-  padding-bottom: 9px;
-  margin: 40px 0 20px;
+  padding-bottom: 4px;
+  margin: 10px 0 10px;
 }
 
 #sub{
-  font-size: 28px;
+  font-size: 15px;
 }
 
 #cc{
@@ -25,7 +25,7 @@ h1{
 }
 
 #about{
-    margin-bottom:20px;
+    margin-bottom:15px;
 }
 
 #about:hover{
@@ -33,7 +33,7 @@ h1{
 }
 
 h2{
-  font-size: 28px
+  font-size: 20px
 }
 
 .modal-dialog{
@@ -70,8 +70,9 @@ h2{
 }
 
 #vis {
-  width: 940px;
-  height: 500;
+    /* 940w/ 500h */
+  width: 640px;
+  height: 455px;
   clear: both;
 
   display: block;

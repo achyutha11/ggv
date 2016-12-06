@@ -19054,6 +19054,12 @@ var igv = (function (igv) {
                             }
                             xOrigin = Math.round(referenceFrame.toPixels((trackView.tile.startBP - referenceFrame.start)));
                             popupData = trackView.track.popupData(genomicLocation, canvasCoords.x - xOrigin, canvasCoords.y);
+                            console.log(canvasCoords);
+                            console.log((canvasCoords.x - xOrigin)*referenceFrame.bpPerPixel);
+                            console.log(xOrigin);
+                            console.log(trackView);
+                            console.log(referenceFrame);
+                            console.log(genomicLocation);
                             console.log(popupData);
                             var handlerResult = igv.browser.fireEvent('trackclick', [trackView.track, popupData]);
 
@@ -19062,13 +19068,15 @@ var igv = (function (igv) {
                                 if (popupData && popupData.length > 0) {
                                     igv.popover.presentTrackPopup(e.pageX, e.pageY, igv.formatPopoverText(popupData), false);
                                     var rsID = popupData[0]['value'];
-                                    if(!rsID.search('rs')){
-                                      console.log('found rsID: ' + rsID);
-                                      $(document).trigger("igvclick");
-                                      $('#search').val(rsID);
-                                      document.getElementById('submit').click();
-                                      $('#search').val('');
-                                    }
+                                    //if(!rsID.search('rs')){
+                                    //  console.log('found rsID: ' + rsID);
+                                    $(document).trigger("igvclick");
+                                    console.log(referenceFrame.chr);
+                                    console.log(referenceFrame.chr.concat(":").concat(genomicLocation));
+                                    $('#search').val(referenceFrame.chr.concat(":").concat(genomicLocation + 1));
+                                    document.getElementById('submit').click();
+                                    $('#search').val('');
+                                    //}
                                 }
                             // A handler returned custom popover HTML to override default format
                             } else if (typeof handlerResult === 'string') {
