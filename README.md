@@ -1,2 +1,3 @@
-ggv
+
+Geography of Genetics Variants Browser
 ===
