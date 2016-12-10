@@ -8,7 +8,7 @@ Production version:  http://popgen.uchicago.edu/ggv/
 
 Development version: http://popgen.uchicago.edu/dev/ggv
 
-Example calls with queries (development version only):
+## Example calls with queries (development version only):
 
 #### Query default data (1000 Genomes phase 3) by chromosome and position:
 http://popgen.uchicago.edu/dev/ggv/?chr=10&pos=114900524
