@@ -1,6 +1,6 @@
 
 
-### Geography of Genetics Variants Browser
+# Geography of Genetics Variants Browser
 ===
 
 
