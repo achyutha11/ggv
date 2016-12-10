@@ -1,7 +1,6 @@
 
 
 # Geography of Genetics Variants Browser
-===
 
 Production version:  http://popgen.uchicago.edu/ggv/
 
