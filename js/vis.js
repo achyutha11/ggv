@@ -36,7 +36,7 @@
     projection = null;
     countries = null;
     path = null;
-    currentDataset = '1000genomes_phase3';
+    currentDataset = '1000genomes';
 
 
     freqMap = (function(_this) {
@@ -120,7 +120,7 @@
     // updates the map projection
     // particularly important when going to european projection
     freqMap.updateMapSimple = function(dataset) {
-
+	console.log('updateMapSimple')
       /*
       country_raw = countries.features.filter (d) =>
         if d.id == 840
@@ -135,12 +135,12 @@
       t = [width / 2 - s * x, height / 2 - s * y]
        */
        $(document).trigger("datasetChange", [dataset, currentDataset]);
-      if (dataset === '1000genomes_phase3') {
+      if (dataset === '1000genomes') {
         vis.selectAll('.map-path-50').remove();
         projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
         vis.selectAll('.map-path').attr('d', path);
         return currentDataset = dataset;
-      } else if (dataset === '1000genomes_superpops_phase3') {
+      } else if (dataset === '1000genomes_superpops') {
         vis.selectAll('.map-path-50').remove();
         projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
         vis.selectAll('.map-path').attr('d', path);
@@ -166,6 +166,7 @@
           });
 
         })
+        return currentDataset = dataset;
       } else {
         vis.selectAll('.map-path-50').remove();
         projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
@@ -228,14 +229,22 @@
       chr = coords.split(':')[0];
       pos = coords.split(':')[1];
       alleles = currentNodes[0].alleles;
-      if (currentDataset === '1000genomes_phase3') {
+      if (currentDataset === '1000genomes') {
         build = 'hg19';
       } else {
         build = 'hg18';
       }
       $('#variant h2').html(("<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + build + "&position=chr" + chr + "%3A" + pos + "-" + pos + "' target='_blank'>chr" + coords + "</a>") + (" <span style='color:" + minColor + "'>" + alleles[0] + "</span>/<span style='color: " + majColor + "'>" + alleles[1] + "</span>"));
       console.log(coords);
+
       $(document).trigger("updateWindow", [coords]);// added by Alex Mueller 7/11/16 to update brush
+
+      // JN added 1/11/16 to update url query 
+      if (history.pushState) {
+
+	  var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?data="'+ $('#dataset').chosen().val() +'"&chr=' + chr + '&pos=' + pos;
+	  window.history.pushState({path:newurl},'',newurl);
+      }	
 
       node = vis.selectAll(".node").data(currentNodes, function(d) {
         return d.id;
@@ -632,6 +641,25 @@
 
     d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>");
 
+    setDataLink = function(){
+        dataset = $('#dataset').chosen().val();
+      if (dataset === '1000genomes') {
+        $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
+      } else if (dataset === '1000genomes_superpops') {
+        $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
+      } else if (dataset === 'HGDP') {
+        $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
+      } else if (dataset === 'HGDPimputedto1000genomes') {
+	$('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
+      } else if (dataset === 'ExAC') {
+        $('#dataLink').attr("href", "http://exac.broadinstitute.org").attr('target', '_blank');
+      } else if (dataset === 'POPRES_Euro') {
+        $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
+      }
+      $("#dataset").trigger("chosen:updated");
+    }
+
+
     // JN 12/10/16 Adding code for parsing url query string and initializing
 
     // JN added to aid with URL parsing.  Credit : https://davidwalsh.name/query-string-javascript
@@ -647,12 +675,12 @@
     urlrsID = getUrlParameter('rsid');
     urlrandom = getUrlParameter('random_snp')
     urldataset = getUrlParameter('data').replace(/['"]+/g, '');
-   console.log(urldataset);
-
+      
     defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';  
+    defaultdataset='1000genomes'
 
     if(!urldataset)
-	urldataset='1000genomes';
+	urldataset=defaultdataset;
     
     if(urlchr && urlpos){
 	initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="'+ urldataset +'_table"&chr=' + urlchr + '&pos=' + urlpos;
@@ -663,46 +691,42 @@
     } else {
 	initapiquery = defaultapiquery;
     }
-    
+
    d3.json(initapiquery, (function(_this) {
       return function(error, data) {
         console.log(initapiquery);
+
 	 if(error){
 	     $("#alert").modal('show');
              console.log('Error with initial API query.');
+	     urldataset=defaultdataset;
 
-	      d3.json(defaultapiquery,function(error,data){
-		  console.log('Pulling from default api query instead.');
-		  return plot('#vis', data);
+	     d3.json(defaultapiquery,function(error,data){
+		 console.log('Pulling from default api query instead.');
+		 return plot('#vis', data);
               });
 	 }
+
+	document.getElementById('dataset').value = urldataset;
+	setDataLink(urldataset);
         return plot('#vis', data);
       };
     })(this));
 
-    $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
+
+  
     d3.selectAll("#layouts a").on("click", function(d) {
       var newLayout;
       newLayout = d3.select(this).attr("id");
       activate("layouts", newLayout);
       return plot.toggleLayout(newLayout);
     });
+
+
     $('#dataset').chosen().change(function() {
       var chrom, currentCoord, dataset, pos, url;
       dataset = $('#dataset').chosen().val();
-      if (dataset === '1000genomes') {
-        $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
-      } else if (dataset === '1000genomes_superpops') {
-        $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
-      } else if (dataset === 'HGDP') {
-        $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
-      } else if (dataset === 'HGDPimputedto1000genomes') {
-	$('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
-      } else if (dataset === 'ExAC') {
-        $('#dataLink').attr("href", "http://exac.broadinstitute.org").attr('target', '_blank');
-      } else if (dataset === 'POPRES_Euro') {
-        $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
-      }
+      setDataLink();
       currentCoord = plot.getCurrentNodes()[0].coord.split(':');
       chrom = currentCoord[0];
       pos = currentCoord[1];
@@ -710,6 +734,27 @@
       plot.updateMapSimple(dataset);
       return plot.updateData(url);
     });
+
+
+   // JN Here's where we handle that the defaults all need changing if the initapiquery differed
+   if(initapiquery != defaultapiquery) {
+       // Update the map view
+       //return plot.updateData(initapiquery);
+       //console.log("updating map...")
+      //dataset = $('#dataset').chosen().val();
+       //plot.updateMapSimple(dataset);
+       
+       // update the IGV
+       console.log("Updating IGC")
+       coords=urlchr+':'+urlpos
+       console.log(coords)
+console.log("triggering events..")
+       $(document).trigger("updateWindow",coords);// added by Alex Mueller 7/11/16 to update brush
+       $(document).trigger("datasetChange", [urldataset,defaultdataset]);
+
+   }
+
+
     d3.select('#random').on("click", function() {
       var dataset, url;
       dataset = $('#dataset').chosen().val();
@@ -969,9 +1014,11 @@
     // div that contains the browser
     console.log('igv browser');
     var browserdiv = document.getElementById("browserContainer");
+
     // options for browser
     var options = {
 	
+
 	    locus : '1:222087783-222087883',
 
             reference: {
