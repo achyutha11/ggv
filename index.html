@@ -155,13 +155,31 @@
               <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle"></i></h4>
             </div>
             <div class="modal-body">
-              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. Acceptable searches by chromosome/pos or rsID look like...<br><br>
-              chr1:742429
+              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. <br><br>
+
+	      When using the query box, acceptable searches by chromosome/pos or rsID look like...<br><br>
+              <li>chr1:742429</li>
               <br>
-              1:742429
+              <li>1:742429</li>
               <br>
-              rs3094315
+              <li>rs3094315</li>
               <br>
+	      When using a url-based query, acceptable searches look like: <br><br>
+	      
+<li> Query default data (1000 Genomes phase 3) by chromosome and position:<br>
+<a href>http://popgen.uchicago.edu/dev/ggv/?chr=10&pos=114900524</a></li>
+<br>
+<li> Query default data by rsid:<br>
+<a href> http://popgen.uchicago.edu/dev/ggv/?data="1000genomes"&rsid=rs1799983</a></li>
+<br>
+<li> Query default data for a random SNP<br>
+<a href> http://popgen.uchicago.edu/dev/ggv/?data="1000genomes"&random_snp=True</a></li>
+<br>
+<li> Query an alternate dataset:<br>
+<a href>http://popgen.uchicago.edu/dev/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847</a></li>
+
+
+
             </div>
           </div>
         </div>

@@ -648,6 +648,9 @@
     urlrandom = getUrlParameter('random_snp')
     urldataset = getUrlParameter('data').replace(/['"]+/g, '');
    console.log(urldataset);
+
+    defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';  
+
     if(!urldataset)
 	urldataset='1000genomes';
     
@@ -658,19 +661,20 @@
     } else if (urlrandom){
 	initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&random_snp=True';
     } else {
-	initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
+	initapiquery = defaultapiquery;
     }
     
    d3.json(initapiquery, (function(_this) {
       return function(error, data) {
         console.log(initapiquery);
-
 	 if(error){
-	$("#alert").modal('show');
-             console.log('I don\'t know where this is');
-	     // JOE CAN YOU HELP ME ENTER CODE HERE THAT WILL ALLOW GGV TO RECOVER?
-	     // I tried following but it is a stab in the dark
-	      data = d3.json('http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833');
+	     $("#alert").modal('show');
+             console.log('Error with initial API query.');
+
+	      d3.json(defaultapiquery,function(error,data){
+		  console.log('Pulling from default api query instead.');
+		  return plot('#vis', data);
+              });
 	 }
         return plot('#vis', data);
       };
