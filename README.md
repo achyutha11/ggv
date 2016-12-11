@@ -18,7 +18,7 @@ http://popgen.uchicago.edu/dev/ggv/?rsid=rs1799983
 http://popgen.uchicago.edu/dev/ggv/?random_snp=True
 
 #### Query an alternate dataset:
-http://popgen.uchicago.edu/dev/ggv/?data=%221000genomes_superpops%22&chr=12&pos=11957847
+http://popgen.uchicago.edu/dev/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847
 
 Viable datasets are listed in the dropdown box. 
 
