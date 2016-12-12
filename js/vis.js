@@ -41,7 +41,7 @@
         projection = null;
         countries = null;
         path = null;
-        currentDataset = '1000genomes';
+        currentDataset = $('#dataset').chosen().val();;
 
 
         freqMap = (function(_this) {
@@ -974,10 +974,10 @@
             //return plot.updateData(initapiquery);
             //console.log("updating map...")
             // Initalize the map and then update it?
-            console.log("Updating map..");
-            dataset = $('#dataset').chosen().val();
-            plot.updateMapSimple(dataset);
-            plot.updateData(initapiquery);
+            //console.log("Updating map..");
+            //dataset = $('#dataset').chosen().val();
+            //plot.updateMapSimple(dataset);
+            //plot.updateData(initapiquery);
         }
 
 
