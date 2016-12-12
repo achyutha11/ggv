@@ -41,8 +41,10 @@
         projection = null;
         countries = null;
         path = null;
-        currentDataset = '1000genomes';
-
+        //currentDataset = $('#dataset').chosen().val();
+        // $('#dataset').chosen().val(); doesn't work
+        currentDataset = "POPRES_Euro";
+        console.log(currentDataset+"!!!!!!");
 
         freqMap = (function(_this) {
             return function(selection, data) {
@@ -51,6 +53,10 @@
                     [3, 3],
                     [width - 3, height - 3]
                 ]).scale(120).translate([width / 2, height / 2]);
+                // fix for europe map init 
+                if(currentDataset == "POPRES_Euro"){
+                    projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+                }
                 path = d3.geo.path().projection(projection);
                 graticule = d3.geo.graticule();
                 currentNodes = setupNodes(data);
@@ -84,15 +90,32 @@
                     'stroke-width': '.3px',
                     'stroke-opacity': '.5'
                 }).classed("map-path", true);
-                return d3.json('data/world-110m.json', function(error, world) {
-                    // return d3.json('data/world-110m.json', function(error, world) {
-                    countries = topojson.feature(world, world.objects.countries);
-                    vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
-                        'd': path,
-                        'fill': '#aaa'
-                    }).classed('countries', true);
-                    return update();
-                });
+
+                // fix for europe map init 
+                if(currentDataset == "POPRES_Euro"){
+                    projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+
+                    vis.selectAll('.map-path').attr('d', path);
+
+                    return d3.json('data/world-50m.json', function(error, world) {
+                        countries = topojson.feature(world, world.objects.countries);
+                        vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
+                            'd': path,
+                            'fill': '#aaa'
+                        }).classed('countries', 'true');
+                        return update();
+                    });
+                } else {
+                    return d3.json('data/world-110m.json', function(error, world) {
+                        // return d3.json('data/world-110m.json', function(error, world) {
+                        countries = topojson.feature(world, world.objects.countries);
+                        vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
+                            'd': path,
+                            'fill': '#aaa'
+                        }).classed('countries', true);
+                        return update();
+                    });
+                }
             };
         })(this);
 
@@ -147,16 +170,40 @@
                 vis.selectAll('.map-path-50').remove();
                 projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
                 vis.selectAll('.map-path').attr('d', path);
+                d3.json('data/world-110m.json', function(error, world) {
+                    // return d3.json('data/world-110m.json', function(error, world) {
+                    countries = topojson.feature(world, world.objects.countries);
+                    vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
+                        'd': path,
+                        'fill': '#aaa'
+                    });
+                });
                 return currentDataset = dataset;
             } else if (dataset === '1000genomes_superpops') {
                 vis.selectAll('.map-path-50').remove();
                 projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
                 vis.selectAll('.map-path').attr('d', path);
+                d3.json('data/world-110m.json', function(error, world) {
+                    // return d3.json('data/world-110m.json', function(error, world) {
+                    countries = topojson.feature(world, world.objects.countries);
+                    vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
+                        'd': path,
+                        'fill': '#aaa'
+                    });
+                });
                 return currentDataset = dataset;
             } else if (dataset === 'HGDP') {
                 vis.selectAll('.map-path-50').remove();
                 projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
                 vis.selectAll('.map-path').attr('d', path);
+                d3.json('data/world-110m.json', function(error, world) {
+                    // return d3.json('data/world-110m.json', function(error, world) {
+                    countries = topojson.feature(world, world.objects.countries);
+                    vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
+                        'd': path,
+                        'fill': '#aaa'
+                    });
+                });
                 return currentDataset = dataset;
             } else if (dataset == 'POPRES_Euro') {
                 projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
@@ -847,7 +894,6 @@
         //    'build': 'hg19',
         //    'view': 'global'
         //  }
-        plot = FreqMap();
         activate("layouts", 'true');
         dropDown = d3.select("#datasets").append("select").attr("id", "dataset").attr('class', 'chosen');
         options = dropDown.selectAll("option").data(test_dd).enter().append("option");
@@ -882,6 +928,7 @@
             $("#dataset").trigger("chosen:updated");
         }
 
+        plot = FreqMap();
 
         // JN 12/10/16 Adding code for parsing url query string and initializing
 
