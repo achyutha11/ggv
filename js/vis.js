@@ -41,7 +41,7 @@
         projection = null;
         countries = null;
         path = null;
-        currentDataset = $('#dataset').chosen().val();;
+        currentDataset = $('#dataset').chosen().val();
 
 
         freqMap = (function(_this) {
