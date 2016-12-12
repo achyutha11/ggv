@@ -1,0 +1,234 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>GGV</title>
+  <link rel="icon" href="/css/map.ico">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/tipsy.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <!--<link rel="stylesheet" href="css/Flat-UI-master/css/flat-ui.css">!-->
+  <link rel="stylesheet" href="css/font-awesome-4.2.0/css/font-awesome.css">
+  <link rel="stylesheet" href="css/chosen.css">
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css"/>
+  <link rel="stylesheet" href="js/jQuery-File-Upload-9.7.1/css/jquery.fileupload.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="js/igv/ggv-igv-1.0.1.css">
+
+</head>
+
+<body>
+
+  <div class="container" id='all'>
+    <div id="main" role="main">
+      <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      <h1>Geography of Genetic Variants Browser<p id='sub'>v0.4 (Beta)</p></h1>
+      <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About / Help</a></p>
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">About</h4>
+            </div>
+            <div class="modal-body">
+              Welcome to the Geography of Genetic Variants (GGV) browser! <br><br> To begin, pick
+              a dataset on the dropdown menu. One can search variants within a dataset by its rsID or position
+              (Use the format chromosome#:position, as in, 15:24608502 or chr15:24608502) and clicking the search button or the enter key. The embedded IGV browser at the bottom of the page can also
+		    also be used to pick a variant for display.  Otherwise click
+              the "random" button to show a random marker from the chosen dataset. One can also hover over a pie
+              chart to display the population name, minor allele frequency, minor allele count, and sample size. Click on the position title to open up the UCSC genome browser at that variant.
+              <br><br>Be sure to note we use a notion of a "frequency scale" to display rare variants.  This is explained in the lower left with a legend.
+              <br><br>
+              If you use the maps in other works, include the source link: <a href=http://www.popgen.uchicago.edu/ggv/>http://www.popgen.uchicago.edu/ggv</a>
+              and/or make a formal reference to:<br> <i>JH Marcus and J Novembre.  Geography of Genetic Variants Browser v0.1. http://www.popgen.uchicago/ggv/</i>.
+              <br><br>Keep in mind that this
+              is still a rough draft and many ideas/resources are in progress.
+ 	            <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com
+              <br><br>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="browser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">IGV Genome Browser Help</h4>
+            </div>
+            <div class="modal-body">
+              To use the embedded IGV Browser, input the number of the chromosome you would like to look at in the search box and hit enter. You can zoom in/out on the chromosome by clicking on the +/- buttons on the right side of the browser. You can zoom in on a specific section of the chromosome by clicking and dragging along the axis.
+              <br><br>
+              To move about the chromosome, you can use the arrow keys to move left or right. You can also click and drag on the genes and variants sections if you would like to make smaller movements. To jump to another section of the chromosome, you can click on areas you would like to look at on the upper chromosome display, and the red window will move there.
+              <br><br>
+              If you click on a variant (vertical grey bar) in the variants section, then that variant will be displayed on the map above. Also, if you search for a variant in the upper search box by the map, the browser will switch to the variant's chromosome and zoom into that variant's location along the chromosome.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel"><i class="fa fa-list-ol"></i></h4>
+            </div>
+            <div class="modal-body">
+              <form id='snpArea'>
+                copy paste a single column of snps <i class="fa fa-long-arrow-down"></i>. Remeber to select the appropriate dataset!
+                <textarea id='snp_col' class="form-control" rows="3" type="text"></textarea>
+                <button id='submitArea' type="button" class="btn btn-default">submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row' id='settings'>
+        <div id="dropDown" class='col-sm-4'>
+          <div id='datasets'>
+          </div>
+        </div>
+        <div class='col-sm-4'>
+          <div id='variant_settings'>
+            <div>
+              <form id='buttons' class='btn-group' onSubmit="return false;">
+                <input id='search' type="text" class="form-control" placeholder='rsID/chr#:pos'>
+                <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+                <button id='random' type='button' class="btn btn-default">random</button>
+                <button id='upload' type='button' class="btn btn-default" data-toggle="modal" data-target="#upload"><i class="fa fa-list-ol"></i></button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+	 <!--- JN removed population scheme dropdown -->
+
+        <div id="layouts" class='col-sm-4'>
+          <div class='btn-group'>
+			<a id="true" class="btn btn-default">True Position</a>
+            <a id="charged" class="btn btn-default">Avoid Overlap</a>
+<!--            <button id="true" type="button" class="btn btn-default">True Position</button>
+            <button id="charged" type="button" class="btn btn-default">Avoid Overlap</button> -->
+          </div>
+        </div>
+
+        <div class='col-sm-12'>
+          <!-- PDF button added by Alex Mueller 08-15-2016 -->
+          <div class="btn-group">
+            <a id="pdf" class="btn btn-default">Save As PDF</a>
+          </div>
+          <!-- end -->
+        </div>
+
+        <div class='col-sm-2' id='slider-holder'>
+          <div id="slider"></div>
+        </div>
+
+      </div>
+
+      <div class="modal fade" id="alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle"></i></h4>
+            </div>
+            <div class="modal-body">
+              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. Acceptable searches by chromosome/pos or rsID look like...<br><br>
+              chr1:742429
+              <br>
+              1:742429
+              <br>
+              rs3094315
+              <br>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="vis">
+        <div id='variant'><h2></h2></div>
+      </div>
+      <div class="row" id='legend'>
+        <div id='freqLegend' class="col-sm-6">
+          <h3></h3>
+          <p></p>
+        </div>
+        <div id='transLegend' class="col-sm-6">
+          <h3></h3>
+          <p></p>
+        </div>
+        <!-- <div id='testLegend' class="col-sm-4">
+          <h3></h3>
+          <p></p>
+        </div> -->
+      </div>
+      <!-- <div id="scales">
+        <h3></h3>
+        <a data-toggle="modal" data-target="#browser"><p>Help</p></a>
+
+      </div> -->
+    </div>
+    <div>
+      <!-- <h3>Variants Browser</h3> removed JRT 10-14-16 -->
+      <div id="browserContainer">
+      </div>
+      <a data-toggle="modal" data-target="#browser"><p>Variants Browser Help</p></a>
+    </div>
+  </div>
+  <footer id='footer'>
+    <div id='text'>
+      <p><a href='http://jnpopgen.org/' target='_blank'>Novembre Lab</a><br>Developed by Joe Marcus and John Novembre with Jeff Tharsen and Alex Mueller<br>Department of Human Genetics, University of Chicago</p>
+      <!--<a href="http://creativecommons.org/licenses/by/4.0/"><img src='data/by.png' id='cc'></a>!-->
+      <a href="http://creativecommons.org/licenses/by/4.0/" target='_blank'><i class="fa fa-cc fa-2x"></i></a>
+
+    </div>
+  </footer>
+
+  <script src="js/jquery-1.11.0.js"></script>
+  <script src="js/colorbrewer.v1.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/jquery.tipsy.js"></script>
+  <script src="js/d3.v3.min.js"></script>
+  <script src="js/d3.geo.projection.v0.min.js"></script>
+  <script src="js/topojson.v1.min.js"></script>
+  <script src="js/chosen.jquery.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+  <script src="js/jQuery-File-Upload-9.7.1/js/jquery.iframe-transport.js"></script>
+  <script src="js/jQuery-File-Upload-9.7.1/js/jquery.fileupload.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+  <script type="text/javascript" src="js/pdfkit.js"></script>
+  <!-- <script src="https://github.com/devongovett/blob-stream/releases/download/v0.1.2/blob-stream-v0.1.2.js"></script> -->
+  <script type="text/javascript" src="js/blob-stream.js"></script>
+  <script type="text/javascript" src="js/igv/ggv-igv-1.0.1.js"></script>
+  <script type="text/javascript" src="js/vis.js"></script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-52770606-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+</body>
+</html>
