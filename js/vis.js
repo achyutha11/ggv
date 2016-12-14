@@ -41,9 +41,9 @@
         projection = null;
         countries = null;
         path = null;
-        //currentDataset = $('#dataset').chosen().val();
+        currentDataset = $('#dataset').chosen().val();
         // $('#dataset').chosen().val(); doesn't work
-        currentDataset = "POPRES_Euro";
+        //currentDataset = "POPRES_Euro";
         console.log(currentDataset+"!!!!!!");
 
         freqMap = (function(_this) {
@@ -120,13 +120,15 @@
         })(this);
 
         // updates the data shown on the page
-        freqMap.updateData = function(url) {
+        freqMap.updateData = function updateData(url) {
             console.log('updatedata');
             return d3.json(url, function(error, data) {
                 console.log(data);
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
                     $("#alert").modal('show');
+		    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
+		    updateData(url);
                     //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
                     //return d3.json(url, function(error, data) {
                     //  currentNodes = setupNodes(data);
@@ -285,17 +287,16 @@
             chr = coords.split(':')[0];
             pos = coords.split(':')[1];
             alleles = currentNodes[0].alleles;
-            if (currentDataset === '1000genomes') {
-                build = 'hg19';
-            } else {
-                build = 'hg18';
-            }
+
+	    // Note : current datasets are all on hg19!  Use if statements here to fix otherwise.
+            build = 'hg19';
+
             $('#variant h2').html(("<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + build + "&position=chr" + chr + "%3A" + pos + "-" + pos + "' target='_blank'>chr" + coords + "</a>") + (" <span style='color:" + minColor + "'>" + alleles[0] + "</span>/<span style='color: " + majColor + "'>" + alleles[1] + "</span>"));
             console.log(coords);
 
             $(document).trigger("updateWindow", [coords]); // added by Alex Mueller 7/11/16 to update brush
 
-            // JN added 1/11/16 to update url query
+            // JN added 12/11/16 to update url query
             if (history.pushState) {
 
                 var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?data="' + $('#dataset').chosen().val() + '"&chr=' + chr + '&pos=' + pos;
@@ -303,6 +304,7 @@
                     path: newurl
                 }, '', newurl);
             }
+
 
             node = vis.selectAll(".node").data(currentNodes, function(d) {
                 return d.id;
@@ -659,7 +661,7 @@
             };
         };
         return freqMap;
-    };
+    }; // end FreqMap declaration
 
 
     // Alex Mueller's P1C Functions
@@ -690,29 +692,15 @@
                 }
             },
 
-            tracks: [{
-                name: "Genes",
-                url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-                index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-                displayMode: "EXPANDED",
-                color: "#aaaaaa",
-                order: 0
-            }, {
-                name: "Variants",
-                format: "vcf",
-                url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-                indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
-                type: "variant",
-                color: "#aaaaaa",
-                order: 1
-            }]
         };
 
 
-        //***** ALEX'S P1C FUNCTIONS *****//
-
         // creates browser instance
         var browser = igv.createBrowser(browserdiv, options);
+
+
+
+        //***** ALEX'S P1C FUNCTIONS *****//
 
         // when the user searches for a new variant, the updateWindow event is called
         // the function below will set the IGV browser window to 10 kb around the
@@ -805,8 +793,8 @@
         }, {
             name: "Variants",
             format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
+            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/hgdp_hg19_snps.vcf.gz",
+            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/hgdp_hg19_snps.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -822,8 +810,8 @@
         }, {
             name: "Variants",
             format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
+            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs_hg19.vcf.gz",
+            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs_hg19.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -834,12 +822,15 @@
         // The info is currently not correct and all tracks contain the info for 1000genomes
         // and should be updated soon
         $(document).on("datasetChange", function(event, newDataset, oldDataset) {
+	    console.log("IGV changing tracks for new data "+newDataset+' '+oldDataset);
             if (oldDataset == newDataset) {
                 return;
             }
             // removes the tracks
-            browser.removeTrack(browser.trackViews[2].track); // gene track
-            browser.removeTrack(browser.trackViews[2].track); // variants track
+	    if(browser.trackViews[2]){
+		browser.removeTrack(browser.trackViews[2].track); // gene track
+		browser.removeTrack(browser.trackViews[2].track); // variants track
+	    }
 
             // sets the tracks to the new track info
             if (newDataset == 'HGDP') {
@@ -888,12 +879,12 @@
             'dataset': 'POPRES_Euro',
             'build': 'hg19',
             'view': 'europe'
-        }];
-        //{
-        ///    'dataset': 'HGDPimputedto1000genomes',
-        //    'build': 'hg19',
-        //    'view': 'global'
-        //  }
+        }, //];
+        {
+            'dataset': 'HGDPimputedto1000genomes',
+            'build': 'hg19',
+            'view': 'global'
+          }];
         activate("layouts", 'true');
         dropDown = d3.select("#datasets").append("select").attr("id", "dataset").attr('class', 'chosen');
         options = dropDown.selectAll("option").data(test_dd).enter().append("option");
@@ -928,8 +919,6 @@
             $("#dataset").trigger("chosen:updated");
         }
 
-        plot = FreqMap();
-
         // JN 12/10/16 Adding code for parsing url query string and initializing
 
         // JN added to aid with URL parsing.  Credit : https://davidwalsh.name/query-string-javascript
@@ -940,6 +929,8 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         };
 
+
+	console.log('Grabbing url at start-up...');
         urlchr = getUrlParameter('chr');
         urlpos = getUrlParameter('pos');
         urlrsID = getUrlParameter('rsid');
@@ -949,9 +940,7 @@
         defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
         defaultdataset = '1000genomes'
 
-        if (!urldataset)
-            urldataset = defaultdataset;
-
+        
         if (urlchr && urlpos) {
             initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&chr=' + urlchr + '&pos=' + urlpos;
         } else if (urlrsID) {
@@ -962,6 +951,30 @@
             initapiquery = defaultapiquery;
         }
 
+        
+	if (!urldataset)
+            urldataset = defaultdataset;
+
+	document.getElementById('dataset').value = urldataset;
+
+        plot = FreqMap();
+
+
+        // JN Here's where we handle that the defaults all need changing if the initapiquery differed
+
+        if (initapiquery != defaultapiquery) {
+            // update the IGV
+            console.log("Updating IGV");
+            $(document).trigger("updateWindow", coords); // to trigger IGV window change
+	    $(document).trigger("datasetChange", [urldataset,"x"]); // to trigger IGV track dataset change
+
+
+        }
+
+
+
+
+	
         d3.json(initapiquery, (function(_this) {
             return function(error, data) {
                 console.log(initapiquery);
@@ -1000,41 +1013,26 @@
             currentCoord = plot.getCurrentNodes()[0].coord.split(':');
             chrom = currentCoord[0];
             pos = currentCoord[1];
-            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+            //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+	    
             plot.updateMapSimple(dataset);
             return plot.updateData(url);
         });
 
 
-        // JN Here's where we handle that the defaults all need changing if the initapiquery differed
-
-        if (initapiquery != defaultapiquery) {
-            // update the IGV
-            console.log("Updating IGV");
-            coords = urlchr + ':' + urlpos;
-            console.log(coords);
-            console.log("triggering events..");
-            $(document).trigger("updateWindow", coords); // to trigger IGV window change
-            //$(document).trigger("datasetChange", [urldataset, defaultdataset]); // to trigger IGV track dataset change
-
-            // Update the map view
-            //return plot.updateData(initapiquery);
-            //console.log("updating map...")
-            // Initalize the map and then update it?
-            console.log("Updating map..");
-            dataset = $('#dataset').chosen().val();
-            plot.updateMapSimple(dataset);
-            plot.updateData(initapiquery);
-        }
 
 
         d3.select('#random').on("click", function() {
             var dataset, url;
             dataset = $('#dataset').chosen().val();
+	    console.log('#random touched.');
             url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
             return plot.updateData(url);
         });
+
         $('#buttons').keyup(function(e) {
+	    console.log('#buttons touched');
             var chrom, dataset, pos, rsID, url, variant;
             if (e.which === 13) {
                 if ($('#search').val() === '') {
@@ -1062,7 +1060,8 @@
         });
         $('#submit').click(function() {
             var chrom, dataset, pos, rsID, url, variant;
-            if ($('#search').val() === '') {
+	    console.log("Submit touched.")
+            if ($('#search').val() == '') {
 
             } else {
                 dataset = $('#dataset').chosen().val();
@@ -1094,6 +1093,7 @@
                 step: 1,
                 slide: function(event, ui) {
                     dataset = $('#dataset').chosen().val()
+		    console.log('Submit Area touched.');
                     if (dataTable[ui.value].substring(0, 2) == 'rs') {
                         rsID = dataTable[ui.value]
                         url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID
@@ -1114,6 +1114,8 @@
                 }
             });
         });
+
+
 
     });
 
