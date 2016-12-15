@@ -11,6 +11,11 @@ h1{
   margin: 10px 0 10px;
 }
 
+#error-modal{
+  text-align: center;
+}
+
+
 #sub{
   font-size: 15px;
 }

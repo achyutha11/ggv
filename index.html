@@ -69,6 +69,32 @@
               Marcus & Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="http://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"><i id='linkIcon' class='fa fa-external-link'></i>.</a>
               <br><br>Keep in mind that this
               is still an evolving project and many ideas/resources are in progress.
+
+              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. <br><br>
+
+	      When using the query box, acceptable searches by chromosome/pos or rsID look like...<br><br>
+              <li>chr1:742429</li>
+              <br>
+              <li>1:742429</li>
+              <br>
+              <li>rs3094315</li>
+              <br>
+	      When using a url-based query, acceptable searches look like: <br><br>
+	      
+<li> Query default data (1000 Genomes phase 3) by chromosome and position:<br>
+<a href='http://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'>'http://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'</a></li>
+<br>
+<li> Query default data by rsid:<br>
+<a href='http://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'>'http://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'</a></li>
+<br>
+<li> Query default data for a random SNP<br>
+<a href='http://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'>'http://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'</a></li>
+<br>
+<li> Query an alternate dataset:<br>
+<a href='http://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'>'http://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'</a></li>
+
+
+
  	            <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com or jnovembre at uchicago dot edu.
               <br><br>
             </div>
@@ -154,32 +180,15 @@
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
               <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle"></i></h4>
             </div>
-            <div class="modal-body">
-              Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. <br><br>
-
-	      When using the query box, acceptable searches by chromosome/pos or rsID look like...<br><br>
-              <li>chr1:742429</li>
-              <br>
-              <li>1:742429</li>
-              <br>
-              <li>rs3094315</li>
-              <br>
-	      When using a url-based query, acceptable searches look like: <br><br>
-	      
-<li> Query default data (1000 Genomes phase 3) by chromosome and position:<br>
-<a href='http://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'>'http://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'</a></li>
-<br>
-<li> Query default data by rsid:<br>
-<a href='http://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'>'http://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'</a></li>
-<br>
-<li> Query default data for a random SNP<br>
-<a href='http://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'>'http://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'</a></li>
-<br>
-<li> Query an alternate dataset:<br>
-<a href='http://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'>'http://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'</a></li>
-
-
-
+            <div id="error-modal" class="modal-body">
+	      <h1>
+	      Variant not found 
+	      </h1>
+	      <h2>
+	      Showing a random variant instead. <br><br>
+	      Hint: Use About/Help link to check query string is correct. <br><br>
+	      <br><br>
+	      </h2>
             </div>
           </div>
         </div>

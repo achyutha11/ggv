@@ -126,7 +126,10 @@
                 console.log(data);
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
-                    //$("#alert").modal('show');
+                    $("#alert").modal('show');
+		     setTimeout(function(){
+			 $("#alert").modal("toggle");
+		     }, 2750);
 		    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
 		    updateData(url);
                     //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
