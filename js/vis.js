@@ -55,7 +55,7 @@
                 ]).scale(120).translate([width / 2, height / 2]);
                 // fix for europe map init 
                 if(currentDataset == "POPRES_Euro"){
-                    projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+                    projection.scale(800).rotate([-15, 0, 0]).translate([width / 2 - 0, height / 2 + 675]);
                 }
                 path = d3.geo.path().projection(projection);
                 graticule = d3.geo.graticule();
@@ -93,7 +93,7 @@
 
                 // fix for europe map init 
                 if(currentDataset == "POPRES_Euro"){
-                    projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+                    projection.scale(800).rotate([-15, 0, 0]).translate([width / 2 - 0, height / 2 + 675]);
 
                     vis.selectAll('.map-path').attr('d', path);
 
@@ -126,7 +126,7 @@
                 console.log(data);
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
-                    $("#alert").modal('show');
+                    //$("#alert").modal('show');
 		    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
 		    updateData(url);
                     //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
@@ -208,7 +208,8 @@
                 });
                 return currentDataset = dataset;
             } else if (dataset == 'POPRES_Euro') {
-                projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+                projection.scale(800).rotate([-15, 0, 0]).translate([width / 2 - 0, height / 2 + 675]);
+
                 console.log(path);
 
                 vis.selectAll('.map-path').attr('d', path);
@@ -822,7 +823,7 @@
         // The info is currently not correct and all tracks contain the info for 1000genomes
         // and should be updated soon
         $(document).on("datasetChange", function(event, newDataset, oldDataset) {
-	    console.log("IGV changing tracks for new data "+newDataset+' '+oldDataset);
+	    console.log("IGV changing tracks for new data from "+oldDataset+' to '+newDataset);
             if (oldDataset == newDataset) {
                 return;
             }
@@ -833,7 +834,7 @@
 	    }
 
             // sets the tracks to the new track info
-            if (newDataset == 'HGDP') {
+            if (newDataset == 'HGDPimputedto1000genomes') {
                 var tracks = hgdpTracks;
             } else if (newDataset == 'POPRES_Euro') {
                 var tracks = popresTracks;
@@ -923,7 +924,7 @@
 
         // JN added to aid with URL parsing.  Credit : https://davidwalsh.name/query-string-javascript
         getUrlParameter = function(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
@@ -931,15 +932,15 @@
 
 
 	console.log('Grabbing url at start-up...');
-        urlchr = getUrlParameter('chr');
-        urlpos = getUrlParameter('pos');
-        urlrsID = getUrlParameter('rsid');
-        urlrandom = getUrlParameter('random_snp')
-        urldataset = getUrlParameter('data').replace(/['"]+/g, '');
+        var urlchr = getUrlParameter('chr');
+        var urlpos = getUrlParameter('pos');
+        var urlrsID = getUrlParameter('rsid');
+        var urlrandom = getUrlParameter('random_snp');
+        var urldataset = getUrlParameter('data').replace(/['"]+/g, '');
 
-        defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
-        defaultdataset = '1000genomes'
-
+        var defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
+        var defaultdataset = '1000genomes';
+	var initapiquery = '';
         
         if (urlchr && urlpos) {
             initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&chr=' + urlchr + '&pos=' + urlpos;
@@ -962,14 +963,16 @@
 
         // JN Here's where we handle that the defaults all need changing if the initapiquery differed
 
-        if (initapiquery != defaultapiquery) {
+//        if (initapiquery != defaultapiquery) {
             // update the IGV
             console.log("Updating IGV");
+	    coords = urlchr + ':' + urlpos;
+            console.log(coords);
             $(document).trigger("updateWindow", coords); // to trigger IGV window change
 	    $(document).trigger("datasetChange", [urldataset,"x"]); // to trigger IGV track dataset change
 
 
-        }
+  //      }
 
 
 
