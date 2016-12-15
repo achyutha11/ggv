@@ -828,10 +828,11 @@
                 return;
             }
             // removes the tracks
-	    if(browser.trackViews[2]){
+	    if(browser.trackViews[2])
 		browser.removeTrack(browser.trackViews[2].track); // gene track
+	    if(browser.trackViews[2])
 		browser.removeTrack(browser.trackViews[2].track); // variants track
-	    }
+	    
 
             // sets the tracks to the new track info
             if (newDataset == 'HGDPimputedto1000genomes') {
