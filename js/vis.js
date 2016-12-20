@@ -42,9 +42,9 @@
         countries = null;
         path = null;
         currentDataset = $('#dataset').chosen().val();
-        // $('#dataset').chosen().val(); doesn't work
-        //currentDataset = "POPRES_Euro";
-        console.log(currentDataset+"!!!!!!");
+
+        console.log(currentDataset+"!");
+>>>>>>> master
 
         freqMap = (function(_this) {
             return function(selection, data) {
@@ -1027,6 +1027,28 @@
             return plot.updateData(url);
         });
 
+
+
+        // JN Here's where we handle that the defaults all need changing if the initapiquery differed
+
+        if (initapiquery != defaultapiquery) {
+            // update the IGV
+            console.log("Updating IGV");
+            coords = urlchr + ':' + urlpos;
+            console.log(coords);
+            console.log("triggering events..");
+            $(document).trigger("updateWindow", coords); // to trigger IGV window change
+            //$(document).trigger("datasetChange", [urldataset, defaultdataset]); // to trigger IGV track dataset change
+
+            // Update the map view
+            //return plot.updateData(initapiquery);
+            //console.log("updating map...")
+            // Initalize the map and then update it?
+            //console.log("Updating map..");
+            //dataset = $('#dataset').chosen().val();
+            //plot.updateMapSimple(dataset);
+            //plot.updateData(initapiquery);
+        }
 
 
 
