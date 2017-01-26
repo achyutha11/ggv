@@ -168,11 +168,11 @@ FreqMap = () ->
       old_projection = d3.geo.projection(project).scale(1).translate([width / 2, height / 2])
       old_path = d3.geo.path().projection(old_projection)
 
-      `function project(Î», Ï†) {`
-      Î» *= 180 / Math.PI
-      Ï† *= 180 / Math.PI
-      p0 = projection0([Î», Ï†])
-      p1 = projection1([Î», Ï†])
+      `function project(λ, φ) {`
+      λ *= 180 / Math.PI
+      φ *= 180 / Math.PI
+      p0 = projection0([λ, φ])
+      p1 = projection1([λ, φ])
       return [(1 - t) * p0[0] + t * p1[0], (1 - t) * -p0[1] + t * -p1[1]]
       `}`
 
