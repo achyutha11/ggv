@@ -5,8 +5,6 @@
 
     root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
-
-
     FreqMap = function() {
         var arc, arcTween, charge, collide, colorScale, countries, currentDataset, currentNodes, currentLinks, force, freqMap, height, legend_data, majColor, minColor, moveToPoint, node, nodeG, opacityScale, path, pie, pies, projection, projectionTween, radius, radiusScale, setLayout, setupNodes, tick, tickCharged, trans_data, update, vis, width;
         vis = null;
@@ -44,7 +42,6 @@
         currentDataset = $('#dataset').chosen().val();
 
         console.log(currentDataset+"!");
->>>>>>> master
 
         freqMap = (function(_this) {
             return function(selection, data) {
