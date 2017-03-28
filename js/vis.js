@@ -123,10 +123,10 @@
                 console.log(data);
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
-                    $("#alert").modal('show');
-		     setTimeout(function(){
-			 $("#alert").modal("toggle");
-		     }, 2750);
+                    currentVariant = $("#search").val();
+                    msg = "Error - '" + currentDataset + "' does not have the variant '" + currentVariant + "'";
+                    $("#msg-alert-error").text(msg);
+                    $("#msg-alert").slideDown().delay(2500).slideUp();
 		    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
 		    updateData(url);
                     //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
