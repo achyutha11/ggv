@@ -168,3 +168,7 @@ footer #text{
 .igv-content-canvas {
   position: static;
 }
+
+#msg-alert {
+  display: none;
+}
