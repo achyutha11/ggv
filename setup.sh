@@ -11,4 +11,4 @@ git clone -b ggv-integrated https://github.com/NovembreLab/ggv
 sudo ln -sT ~/ggv /var/www/html/ggv
 
 # Create site - This will overwrite your configuration!
-sudo cat ~/ggv/config/000-default.conf > /etc/apache2/sites-enabled/000-default.conf
+sudo sh -c "cat ~/ggv/config/000-default.conf > /etc/apache2/sites-enabled/000-default.conf"

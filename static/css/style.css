@@ -8,7 +8,7 @@ h1{
   font-size: 28px;
   border-bottom: 1px solid #eeeeee;
   padding-bottom: 4px;
-  margin: 10px 0 10px;
+  padding: 15px;
 }
 
 #sub{
@@ -103,9 +103,7 @@ h2{
 }
 
 .twitter-share-button{
-  position: absolute;
-  right: 10px;
-  top: 20px;
+  float: right;
 }
 
 #ucscLink:link{
