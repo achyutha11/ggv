@@ -1,13 +1,14 @@
 # Setup EC2 instance
 
+# Install Software
 sudo apt-get update
-sudo apt-get install apache2
-sudo apt-get install libapache2-mod-wsgi
-sudo apt-get install python-pip
-sudo pip install flask
+sudo apt-get install -y apache2 libapache2-mod-wsgi python-pip bcftools tabix
+sudo pip install --upgrade pip
+sudo pip install flask ipython
 
-mkdir ~/popgen
-sudo ln -sT ~/popgen /var/www/html/popgen
+# Fetch Code
+git clone -b ggv-integrated https://github.com/NovembreLab/ggv 
+sudo ln -sT ~/ggv /var/www/html/ggv
 
-cd ~/popgen
-echo "Hello World" > index.html
+# Create site - This will overwrite your configuration!
+sudo cat ~/ggv/config/000-default.conf > /etc/apache2/sites-enabled/000-default.conf
