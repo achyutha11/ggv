@@ -128,9 +128,8 @@ class FreqTable(object):
             tabix_snp_pos = lo_list[0][0][3:]+':'+str(lo_list[0][1])+'-'+str(lo_list[0][1])
             vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
 
-        tabix_command = '/home/josephhmarcus/bin/tabix-0.2.6/tabix '+vcf_filename+' '+tabix_snp_pos
-        proc = subprocess.Popen(tabix_command, stdout=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
+        tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
+        out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
@@ -157,8 +156,8 @@ class FreqTable(object):
         else:
             vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
 
-        tabix_command = '/home/josephhmarcus/bin/tabix-0.2.6/tabix '+vcf_filename+' '+tabix_snp_pos
-        proc = subprocess.Popen(tabix_command, stdout=subprocess.PIPE, shell=True)
+        tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
+        proc = subprocess.Popen(tabix_command, stdout=subprocess.PIPE)
         freq_dict = {}
         (out, err) = proc.communicate()
         freq_list = out.strip('\n').split('\n')
