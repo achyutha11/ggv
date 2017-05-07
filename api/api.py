@@ -8,6 +8,11 @@ import httplib2
 import sys
 import json
 from pyliftover import LiftOver
+import logging
+ 
+# add filemode="w" to overwrite
+logging.basicConfig(filename="/var/www/dev-integrated/ggv.log", level=logging.INFO)
+ 
 
 '''
 A simple API to extract Fst and Freq info from tabix-accessible files
@@ -101,6 +106,8 @@ class FreqTable(object):
         tabix_snp_pos = str(chr)+':'+str(pos)+'-'+str(pos)
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
         out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
+        logging.info(out)
+        logging.info(err)
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
