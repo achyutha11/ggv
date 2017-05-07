@@ -34,9 +34,12 @@ def send_static(path):
     basename = os.path.basename(path)
     return send_from_directory(dirname, basename)
 
-@app.route("/test")
-def test():
-    return "great!"
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT')
+    return response
 
 # Set up API resources
 # Basic header info
@@ -46,4 +49,5 @@ api.decorators = [cors.crossdomain(origin='*')]
 
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()
