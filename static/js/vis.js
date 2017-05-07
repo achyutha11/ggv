@@ -104,7 +104,7 @@
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
                     $("#alert").modal('show');
-                    //url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
+                    //url = '/api/freq_table?data="' + currentDataset + '_table"&random_snp=True';
                     //return d3.json(url, function(error, data) {
                     //  currentNodes = setupNodes(data);
                     //  currentLinks = setupLinks(currentNodes);
@@ -741,8 +741,8 @@
         }, {
             name: "Variants",
             format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
+            url: "/sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
+            indexURL: "/sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -758,8 +758,8 @@
         }, {
             name: "Variants",
             format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
+            url: "/sites_data/sites/H938_autoSNPs.sites.vcf.gz",
+            indexURL: "/sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -775,8 +775,8 @@
         }, {
             name: "Variants",
             format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
+            url: "/sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
+            indexURL: "/sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -899,18 +899,18 @@
         urlrandom = getUrlParameter('random_snp')
         urldataset = getUrlParameter('data').replace(/['"]+/g, '');
 
-        defaultapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
+        defaultapiquery = '/api/freq_table?data="1000genomes_table"&chr=1&pos=222087833';
         defaultdataset = '1000genomes'
 
         if (!urldataset)
             urldataset = defaultdataset;
 
         if (urlchr && urlpos) {
-            initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&chr=' + urlchr + '&pos=' + urlpos;
+            initapiquery = '/api/freq_table?data="' + urldataset + '_table"&chr=' + urlchr + '&pos=' + urlpos;
         } else if (urlrsID) {
-            initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&rsID=' + urlrsID;
+            initapiquery = '/api/freq_table?data="' + urldataset + '_table"&rsID=' + urlrsID;
         } else if (urlrandom) {
-            initapiquery = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + urldataset + '_table"&random_snp=True';
+            initapiquery = '/api/freq_table?data="' + urldataset + '_table"&random_snp=True';
         } else {
             initapiquery = defaultapiquery;
         }
@@ -953,7 +953,7 @@
             currentCoord = plot.getCurrentNodes()[0].coord.split(':');
             chrom = currentCoord[0];
             pos = currentCoord[1];
-            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+            url = '/api/freq_table?data="' + dataset + '_table"&random_snp=True';
             plot.updateMapSimple(dataset);
             return plot.updateData(url);
         });
@@ -984,7 +984,7 @@
         d3.select('#random').on("click", function() {
             var dataset, url;
             dataset = $('#dataset').chosen().val();
-            url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&random_snp=True';
+            url = '/api/freq_table?data="' + dataset + '_table"&random_snp=True';
             return plot.updateData(url);
         });
         $('#buttons').keyup(function(e) {
@@ -997,17 +997,17 @@
                     variant = $('#search').val().split(':');
                     if ($('#search').val().substring(0, 2) === 'rs') {
                         rsID = $('#search').val();
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
+                        url = '/api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
                         return plot.updateData(url);
                     } else if (variant[0].substring(0, 3) === 'chr') {
                         chrom = variant[0].substring(3);
                         pos = variant[1];
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+                        url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
                         return plot.updateData(url);
                     } else {
                         chrom = variant[0];
                         pos = variant[1];
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+                        url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
                         return plot.updateData(url);
                     }
                 }
@@ -1022,17 +1022,17 @@
                 variant = $('#search').val().split(':');
                 if ($('#search').val().substring(0, 2) === 'rs') {
                     rsID = $('#search').val();
-                    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
+                    url = '/api/freq_table?data="' + dataset + '_table"&rsID=' + rsID;
                     return plot.updateData(url);
                 } else if (variant[0].substring(0, 3) === 'chr') {
                     chrom = variant[0].substring(3);
                     pos = variant[1];
-                    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+                    url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
                     return plot.updateData(url);
                 } else {
                     chrom = variant[0];
                     pos = variant[1];
-                    url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
+                    url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
                     return plot.updateData(url);
                 }
             }
@@ -1049,19 +1049,19 @@
                     dataset = $('#dataset').chosen().val()
                     if (dataTable[ui.value].substring(0, 2) == 'rs') {
                         rsID = dataTable[ui.value]
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&rsID=' + rsID
+                        url = '/api/freq_table?data="' + dataset + '_table"&rsID=' + rsID
                         plot.updateData(url);
                     } else if (dataTable[ui.value].substring(0, 3) == 'chr') {
                         variant = dataTable[ui.value].split(':')
                         chrom = variant[0].substring(3)
                         pos = variant[1]
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
+                        url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
                         plot.updateData(url);
                     } else {
                         variant = dataTable[ui.value].split(':')
                         chrom = variant[0]
                         pos = variant[1]
-                        url = 'http://popgen.uchicago.edu/ggv_api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
+                        url = '/api/freq_table?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
                         plot.updateData(url);
                     }
                 }
