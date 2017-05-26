@@ -650,6 +650,7 @@ freq_url = window.location.pathname + "api/freq_table";
                 url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
                 index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
                 displayMode: "EXPANDED",
+                type: "annotation",
                 color: "#aaaaaa",
                 order: 0
             }, {
@@ -716,7 +717,7 @@ freq_url = window.location.pathname + "api/freq_table";
         // will be loaded
         // unfortunately I could not find the correct VCFs for hgdp and popres datasets
         // once they are found they can be linked to in the track data
-        var oneThousandTracks = [{
+       var oneThousandTracks = [{
             name: "Genes",
             url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
             index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
@@ -743,8 +744,8 @@ freq_url = window.location.pathname + "api/freq_table";
         }, {
             name: "Variants",
             format: "vcf",
-            url: "/sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
-            indexURL: "/sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
+            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
+            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -760,8 +761,8 @@ freq_url = window.location.pathname + "api/freq_table";
         }, {
             name: "Variants",
             format: "vcf",
-            url: "/sites_data/sites/H938_autoSNPs.sites.vcf.gz",
-            indexURL: "/sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
+            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
+            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
@@ -777,12 +778,13 @@ freq_url = window.location.pathname + "api/freq_table";
         }, {
             name: "Variants",
             format: "vcf",
-            url: "/sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
-            indexURL: "/sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
+            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
+            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
             type: "variant",
             color: "#aaaaaa",
             order: 1
         }];
+
 
         // Whenever the dataset is changed, the genes and variants sections are
         // updated. This requires changing the tracks. the tracks are provided above.
@@ -792,9 +794,9 @@ freq_url = window.location.pathname + "api/freq_table";
             if (oldDataset == newDataset) {
                 return;
             }
-            // removes the tracks
-            browser.removeTrack(browser.trackViews[2].track); // gene track
-            browser.removeTrack(browser.trackViews[2].track); // variants track
+
+            igv.browser.removeTrack(browser.trackViews[2].track); // gene track
+            igv.browser.removeTrack(browser.trackViews[2].track); // variants track
 
             // sets the tracks to the new track info
             if (newDataset == 'HGDP') {

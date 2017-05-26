@@ -21,18 +21,6 @@ def root():
     return render_template('index.html')
 
 
-@app.route('/data/<path:path>')
-@app.route('/css/<path:path>')
-@app.route('/js/<path:path>')
-def send_static(path):
-    print(app.static_folder)
-    app.logger.info("static folder:" + app.static_folder)
-    app.logger.info(app.static_folder + request.path)
-    app.logger.info("JOIN: " + os.path.join(app.static_folder, request.path))
-    path = app.static_folder + request.path
-    dirname = os.path.dirname(path)
-    basename = os.path.basename(path)
-    return send_from_directory(dirname, basename)
 
 @app.after_request
 def after_request(response):
