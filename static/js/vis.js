@@ -658,9 +658,8 @@ freq_url = prefix + "/api/freq_table";
                 url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
                 index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
                 displayMode: "EXPANDED",
-                type: "annotation",
                 color: "#aaaaaa",
-                order: 0,
+                order: 0
             }, {
                 name: "Variants",
                 format: "vcf",
@@ -668,7 +667,7 @@ freq_url = prefix + "/api/freq_table";
                 indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
                 type: "variant",
                 color: "#aaaaaa",
-                order: 1,
+                order: 1
             }]
         };
 
@@ -684,7 +683,7 @@ freq_url = prefix + "/api/freq_table";
             console.log(popoverData);
 
             chrom = igv.browser.$searchInput.val().split(":")[0]
-            pos = popoverData['pos']
+            pos = popoverData['pos'] + 1;
             if (popoverData['data'].length > 0) {
             console.log(urlrsID)
             initapiquery = freq_url + '?data="' + urldataset + '_table"&chr=' + chrom + '&pos=' + pos;
