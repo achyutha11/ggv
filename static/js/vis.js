@@ -85,7 +85,7 @@ freq_url = "http://popgen.uchicago.edu/dev-integrated/api/freq_table";
                     'stroke-width': '.3px',
                     'stroke-opacity': '.5'
                 }).classed("map-path", true);
-                return d3.json('/static/data/world-110m.json', function(error, world) {
+                return d3.json('static/data/world-110m.json', function(error, world) {
                     // return d3.json('data/world-110m.json', function(error, world) {
                     countries = topojson.feature(world, world.objects.countries);
                     vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
