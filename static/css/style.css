@@ -165,3 +165,6 @@ footer #text{
 .node {
   z-index: 10000;
 }
+.map-path-50 {
+  z-index: -10000;
+}
