@@ -86,7 +86,8 @@ freq_url = window.location.pathname + "/api/freq_table";
                     'stroke-opacity': '.5'
                 }).classed("map-path", true);
                 return d3.json(window.location.pathname + '/static/data/world-110m.json', function(error, world) {
-                    // return d3.json('data/world-110m.json', function(error, world) {
+                    console.log(error);
+                    console.log(world)
                     countries = topojson.feature(world, world.objects.countries);
                     vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path", true).classed('countries', true).attr({
                         'd': path,
