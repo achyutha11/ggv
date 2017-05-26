@@ -1,4 +1,4 @@
-freq_url = window.location.pathname + "/api/freq_table";
+freq_url = window.location.pathname + "api/freq_table";
 
 (function() {
     var FreqMap, activate, root, adjustBrushCount;
@@ -85,7 +85,7 @@ freq_url = window.location.pathname + "/api/freq_table";
                     'stroke-width': '.3px',
                     'stroke-opacity': '.5'
                 }).classed("map-path", true);
-                return d3.json(window.location.pathname + '/static/data/world-110m.json', function(error, world) {
+                return d3.json(window.location.pathname + 'static/data/world-110m.json', function(error, world) {
                     console.log(error);
                     console.log(world)
                     countries = topojson.feature(world, world.objects.countries);
@@ -167,7 +167,7 @@ freq_url = window.location.pathname + "/api/freq_table";
                 vis.selectAll('.map-path').attr('d', path);
                 console.log(vis.selectAll('.countries')[0]);
 
-                d3.json(window.location.pathname + '/static/data/world-50m.json', function(error, world) {
+                d3.json(window.location.pathname + 'static/data/world-50m.json', function(error, world) {
                     countries = topojson.feature(world, world.objects.countries);
                     vis.selectAll('.countries').attr('d', '');
                     vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({

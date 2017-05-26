@@ -161,3 +161,7 @@ footer #text{
 .igv-content-canvas {
   position: static;
 }
+
+.node {
+  z-index: 10000;
+}
