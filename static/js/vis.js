@@ -688,26 +688,7 @@ freq_url = prefix + "/api/freq_table";
             console.log(urlrsID)
             initapiquery = freq_url + '?data="' + urldataset + '_table"&chr=' + chrom + '&pos=' + pos;
             console.log(initapiquery);
-        d3.json(initapiquery, (function(_this) {
-            return function(error, data) {
-                console.log(initapiquery);
-
-                if (error) {
-                    $("#alert").modal('show');
-                    console.log('Error with initial API query.');
-                    urldataset = defaultdataset;
-
-                    d3.json(defaultapiquery, function(error, data) {
-                        console.log('Pulling from default api query instead.');
-                        return plot('#vis', data);
-                    });
-                }
-
-                document.getElementById('dataset').value = urldataset;
-                setDataLink(urldataset);
-                return plot('#vis', data);
-            };
-        }));
+            window.plot.updateData(initapiquery);
     }
 
             // Prevent default pop-over behavior
@@ -1004,6 +985,7 @@ freq_url = prefix + "/api/freq_table";
             return plot.updateData(url);
         });
 
+        window.plot = plot;
 
         // JN Here's where we handle that the defaults all need changing if the initapiquery differed
 
