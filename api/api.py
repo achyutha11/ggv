@@ -101,6 +101,8 @@ class FreqTable(object):
         tabix_snp_pos = str(chr)+':'+str(pos)+'-'+str(pos)
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
         out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
+        if err:
+            return err
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
