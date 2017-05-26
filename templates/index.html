@@ -9,22 +9,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>GGV</title>
-  <link rel="icon" href="/css/map.ico">
+  <link rel="icon" href="{{ url_for('static', filename='/css/map.ico') }}">
   <meta name="description" content="">
   <meta name="author" content="">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="css/tipsy.css">
-  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tipsy.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
   <!--<link rel="stylesheet" href="css/Flat-UI-master/css/flat-ui.css">!-->
-  <link rel="stylesheet" href="css/font-awesome-4.2.0/css/font-awesome.css">
-  <link rel="stylesheet" href="css/chosen.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-4.2.0/css/font-awesome.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chosen.css') }}">
   <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css"/>
-  <link rel="stylesheet" href="js/jQuery-File-Upload-9.7.1/css/jquery.fileupload.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" type="text/css" href="js/igv/ggv-igv-1.0.1.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/css/jquery.fileupload.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/igv/ggv-igv-1.0.1.css') }}">
 
 </head>
 
@@ -248,23 +248,23 @@
     </div>
   </footer>
 
-  <script src="js/jquery-1.11.0.js"></script>
-  <script src="js/colorbrewer.v1.min.js"></script>
-  <script src="js/bootstrap.js"></script>
-  <script src="js/jquery.tipsy.js"></script>
-  <script src="js/d3.v3.min.js"></script>
-  <script src="js/d3.geo.projection.v0.min.js"></script>
-  <script src="js/topojson.v1.min.js"></script>
-  <script src="js/chosen.jquery.js"></script>
+  <script src="{{ url_for('static', filename='js/jquery-1.11.0.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/colorbrewer.v1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.tipsy.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/d3.geo.projection.v0.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/topojson.v1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chosen.jquery.js') }}"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-  <script src="js/jQuery-File-Upload-9.7.1/js/jquery.iframe-transport.js"></script>
-  <script src="js/jQuery-File-Upload-9.7.1/js/jquery.fileupload.js"></script>
+  <script src="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/js/jquery.iframe-transport.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/js/jquery.fileupload.js') }}"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
-  <script type="text/javascript" src="js/pdfkit.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/pdfkit.js')  }}"></script>
   <!-- <script src="https://github.com/devongovett/blob-stream/releases/download/v0.1.2/blob-stream-v0.1.2.js"></script> -->
-  <script type="text/javascript" src="js/blob-stream.js"></script>
-  <script type="text/javascript" src="js/igv/ggv-igv-1.0.1.js"></script>
-  <script type="text/javascript" src="js/vis.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/blob-stream.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/igv/ggv-igv-1.0.1.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/vis.js') }}"></script>
 
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
