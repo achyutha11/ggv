@@ -627,8 +627,11 @@ freq_url = prefix + "/api/freq_table";
 
         var currentChrom = 0;
         // div that contains the browser
-        console.log('igv browser');
+
         var browserdiv = document.getElementById("browserContainer");
+
+
+
 
         // options for browser
         var options = {
@@ -657,7 +660,7 @@ freq_url = prefix + "/api/freq_table";
                 displayMode: "EXPANDED",
                 type: "annotation",
                 color: "#aaaaaa",
-                order: 0
+                order: 0,
             }, {
                 name: "Variants",
                 format: "vcf",
@@ -665,7 +668,7 @@ freq_url = prefix + "/api/freq_table";
                 indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
                 type: "variant",
                 color: "#aaaaaa",
-                order: 1
+                order: 1,
             }]
         };
 
@@ -675,15 +678,50 @@ freq_url = prefix + "/api/freq_table";
         // creates browser instance
         var browser = igv.createBrowser(browserdiv, options);
 
+
+        browser.on('trackclick', function (track, popoverData) {
+            var symbol = null;
+            console.log(popoverData);
+
+            chrom = igv.browser.$searchInput.val().split(":")[0]
+            pos = popoverData['pos']
+            if (popoverData['data'].length > 0) {
+            console.log(urlrsID)
+            initapiquery = freq_url + '?data="' + urldataset + '_table"&chr=' + chrom + '&pos=' + pos;
+            console.log(initapiquery);
+        d3.json(initapiquery, (function(_this) {
+            return function(error, data) {
+                console.log(initapiquery);
+
+                if (error) {
+                    $("#alert").modal('show');
+                    console.log('Error with initial API query.');
+                    urldataset = defaultdataset;
+
+                    d3.json(defaultapiquery, function(error, data) {
+                        console.log('Pulling from default api query instead.');
+                        return plot('#vis', data);
+                    });
+                }
+
+                document.getElementById('dataset').value = urldataset;
+                setDataLink(urldataset);
+                return plot('#vis', data);
+            };
+        }));
+    }
+
+            // Prevent default pop-over behavior
+            return false;
+        });
+
+
         // when the user searches for a new variant, the updateWindow event is called
         // the function below will set the IGV browser window to 10 kb around the
         // chosen variant. this will not occur if the user clicks on a variant
         // in the browser
         $(document).on("updateWindow", function(event, coords) {
-            if (!adjustBrushCount) {
-                adjustBrushCount = 1;
-                return;
-            }
+
 
             var chromosome, x, xleft, xright;
             coords = coords.split(':');
@@ -710,12 +748,6 @@ freq_url = prefix + "/api/freq_table";
 
         })
 
-        // if a variant in the IGV canvas is clicked on, this prevents the IGV
-        // window from changing
-        $(document).on("igvclick", function(event) {
-            console.log('igvclick');
-            adjustBrushCount = 0;
-        })
 
         // here are the igv.js tracks for the datasets current included in the GGV
         // when the user switches to a new dataset, a corresponding set of tracks
@@ -800,8 +832,9 @@ freq_url = prefix + "/api/freq_table";
                 return;
             }
 
-            igv.browser.removeTrack(browser.trackViews[2].track); // gene track
-            igv.browser.removeTrack(browser.trackViews[2].track); // variants track
+            igv.browser.removeAllTracks()
+            //igv.browser.removeTrack(browser.trackViews[2].track); // gene track
+            //igv.browser.removeTrack(browser.trackViews[2].track); // variants track
 
             // sets the tracks to the new track info
             if (newDataset == 'HGDP') {
@@ -818,6 +851,7 @@ freq_url = prefix + "/api/freq_table";
             for (i = 0; i < tracks.length; i++) {
                 var track = tracks[i];
                 browser.loadTrack(track);
+
             }
 
         })

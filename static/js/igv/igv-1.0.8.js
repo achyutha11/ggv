@@ -18987,14 +18987,16 @@ var igv = (function (igv) {
                                 return;
                             }
                             xOrigin = Math.round(referenceFrame.toPixels((trackView.tile.startBP - referenceFrame.start)));
-                            popupData = trackView.track.popupData(genomicLocation, canvasCoords.x - xOrigin, canvasCoords.y);
-
+                            popupData = {}
+                            popupData['data'] = trackView.track.popupData(genomicLocation, canvasCoords.x - xOrigin, canvasCoords.y);
+                            popupData['pos'] = genomicLocation
                             var handlerResult = igv.browser.fireEvent('trackclick', [trackView.track, popupData]);
 
                             // (Default) no external handlers or no input from handlers
                             if (handlerResult === undefined) {
                                 if (popupData && popupData.length > 0) {
-                                    igv.popover.presentTrackPopup(e.pageX, e.pageY, igv.formatPopoverText(popupData), false);
+                                    console.log(popupData)
+                                    //igv.popover.presentTrackPopup(e.pageX, e.pageY, igv.formatPopoverText(popupData), false);
                                 }
                             // A handler returned custom popover HTML to override default format
                             } else if (typeof handlerResult === 'string') {
