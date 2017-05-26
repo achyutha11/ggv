@@ -167,7 +167,7 @@ freq_url = window.location.pathname + "/api/freq_table";
                 vis.selectAll('.map-path').attr('d', path);
                 console.log(vis.selectAll('.countries')[0]);
 
-                d3.json('data/world-50m.json', function(error, world) {
+                d3.json(window.location.pathname + '/static/data/world-50m.json', function(error, world) {
                     countries = topojson.feature(world, world.objects.countries);
                     vis.selectAll('.countries').attr('d', '');
                     vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
