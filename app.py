@@ -14,7 +14,7 @@ app.debug = True
 #handler = RotatingFileHandler('/var/www/dev-integrated/ggv.log', maxBytes=10000, backupCount=1)
 #handler.setLevel(logging.INFO)
 #app.logger.addHandler(handler)
-#app.config["APPLICATION_ROOT"] = "/dev-integrated"
+app.config["APPLICATION_ROOT"] = "/dev-integrated"
 
 app.config['STATIC_FOLDER'] = 'static'
 
