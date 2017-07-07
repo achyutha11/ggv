@@ -8,13 +8,15 @@ from logging.handlers import RotatingFileHandler
 import os
 
 
-app = Flask(__name__, static_url_path = '/static', static_folder = 'static')
+
+app = Flask(__name__)
 app.debug = True
 #handler = RotatingFileHandler('/var/www/dev-integrated/ggv.log', maxBytes=10000, backupCount=1)
 #handler.setLevel(logging.INFO)
 #app.logger.addHandler(handler)
-app.config["APPLICATION_ROOT"] = "/dev-integrated"
+#app.config["APPLICATION_ROOT"] = "/dev-integrated"
 
+app.config['STATIC_FOLDER'] = 'static'
 
 @app.route('/')
 def root():
