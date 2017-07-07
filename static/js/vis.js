@@ -1125,8 +1125,8 @@ freq_url = prefix + "/api/freq_table";
             // load fonts
             xml = new XMLHttpRequest;
             xml2 = new XMLHttpRequest;
-            xml.open('GET', 'static/css/fonts/Arvo-Regular.ttf', true);
-            xml2.open('GET', 'static/css/fonts/Arvo-Italic.ttf', true);
+            xml.open('GET', '/static/css/fonts/Arvo-Regular.ttf', true);
+            xml2.open('GET', '/static/css/fonts/Arvo-Italic.ttf', true);
             xml.responseType = "arraybuffer";
             xml2.responseType = "arraybuffer";
             xml.onload = function(event) {
