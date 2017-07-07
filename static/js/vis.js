@@ -675,10 +675,10 @@ freq_url = prefix + "/api/freq_table";
         //***** ALEX'S P1C FUNCTIONS *****//
 
         // creates browser instance
-        var browser = igv.createBrowser(browserdiv, options);
+        igv.createBrowser(browserdiv, options);
 
 
-        browser.on('trackclick', function (track, popoverData) {
+        igv.browser.on('trackclick', function (track, popoverData) {
             var symbol = null;
             console.log(popoverData);
 
@@ -689,7 +689,7 @@ freq_url = prefix + "/api/freq_table";
             initapiquery = freq_url + '?data="' + urldataset + '_table"&chr=' + chrom + '&pos=' + pos;
             console.log(initapiquery);
             window.plot.updateData(initapiquery);
-    }
+        }
 
             // Prevent default pop-over behavior
             return false;
@@ -812,26 +812,26 @@ freq_url = prefix + "/api/freq_table";
                 return;
             }
 
-            igv.browser.removeAllTracks()
-            //igv.browser.removeTrack(browser.trackViews[2].track); // gene track
-            //igv.browser.removeTrack(browser.trackViews[2].track); // variants track
-
+            // Run multiple times...unfortunately?
+            igv.browser.removeAllTracks();
+            igv.browser.removeAllTracks();
+            igv.browser.removeAllTracks();
+            
             // sets the tracks to the new track info
             if (newDataset == 'HGDP') {
-                var tracks = hgdpTracks;
+                var trackset = hgdpTracks;
             } else if (newDataset == 'POPRES_Euro') {
-                var tracks = popresTracks;
+                var trackset = popresTracks;
             } else if (newDataset == 'ExAC') {
-                var tracks = exacTracks;
+                var trackset = exacTracks;
             } else {
-                var tracks = oneThousandTracks;
+                var trackset = oneThousandTracks;
             }
+            console.log(trackset);
 
             // loads the new tracks
-            for (i = 0; i < tracks.length; i++) {
-                var track = tracks[i];
-                browser.loadTrack(track);
-
+            for (i = 0; i < trackset.length; i++) {
+                igv.browser.loadTrack(trackset[i]);
             }
 
         })
