@@ -43,7 +43,7 @@ h2{
 }
 
 .modal-body{
-  text-align: left;
+  text-align: center;
 }
 
 #slider-holder{
@@ -169,4 +169,8 @@ footer #text{
 }
 .map-path-50 {
   z-index: -10000;
+}
+
+#legend #freqLegend, #legend #transLegend {
+  text-align: center;
 }
