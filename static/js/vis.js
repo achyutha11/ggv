@@ -109,26 +109,14 @@ freq_url = prefix + "/api/freq_table";
 
         // updates the data shown on the page
         freqMap.updateData = function(url) {
-            console.log('updatedata');
             return d3.json(url, function(error, data) {
-                console.log(data);
-                console.log(error);
                 if (error) {
+                    console.log(error);
                     currentDataset = $('#dataset').chosen().val();
-                    //$("#alert").modal('show');
                     currentVariant = $("#search").val();
                     msg = "Error - The '" + currentDataset + "' dataset does not have the variant '" + currentVariant + "'."
                     $("#msg-alert-error").text(msg);
                     $("#msg-alert").slideDown().delay(3500).slideUp();
-                    //url = freq_url + '?data="' + currentDataset + '_table"&random_snp=True';
-                    //return d3.json(url, function(error, data) {
-                    //  currentNodes = setupNodes(data);
-                    //  currentLinks = setupLinks(currentNodes);
-                    //  vis.selectAll('.node').remove();
-                    //  console.log('currentNodes');
-                    //  console.log(currentNodes);
-                    //  return update();
-                    //});
                 } else {
                     currentNodes = setupNodes(data);
                     currentLinks = setupLinks(currentNodes);

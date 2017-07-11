@@ -1,12 +1,6 @@
-from flask import Flask,json,Response
-from flask.ext.restful import Api,Resource,reqparse
-from flask.ext.restful.utils import cors
-import subprocess
-import os
+from flask.ext.restful import Resource, reqparse
+from subprocess import Popen, PIPE
 import random
-import httplib2
-import sys
-import json
 from pyliftover import LiftOver
 import requests
 '''
@@ -100,7 +94,7 @@ class FreqTable(object):
 
         tabix_snp_pos = str(chr)+':'+str(pos)+'-'+str(pos)
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
+        out, err = Popen(tabix_command, stdout=PIPE).communicate()
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
@@ -114,7 +108,9 @@ class FreqTable(object):
         '''
         '''
         url = "http://grch37.rest.ensembl.org/variation/human/" + rsID
-        rsID = requests.get(url, headers = {"Content-type": "application/json"}).json()
+        app_json_header = {"Content-type": "application/json"}
+        rsID = requests.get(url,
+                            headers=app_json_header).json()
         snp_pos = str(rsID['mappings'][0]['location'])
         chr = snp_pos.split(':')[0]
         if data_files[self.dataset]['multiple_chr']:
@@ -128,7 +124,7 @@ class FreqTable(object):
             vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
 
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
+        out, err = Popen(tabix_command, stdout=PIPE).communicate()
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
@@ -145,8 +141,9 @@ class FreqTable(object):
             snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['random_end']
         else:
             snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['random_file']
-        snp_proc = subprocess.Popen('shuf -n 1 '+snp_filename, stdout=subprocess.PIPE, shell=True)
-        (snp_out, snp_err) = snp_proc.communicate()
+        comm = ['shuf', '-n', 1, snp_filename]
+        snp_proc = Popen(comm, stdout=PIPE)
+        snp_out, snp_err = snp_proc.communicate()
         arg_list = snp_out.strip('\n').split(' ')
         tabix_snp_pos = arg_list[0]+':'+arg_list[1]+'-'+arg_list[1]
 
@@ -156,13 +153,12 @@ class FreqTable(object):
             vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
 
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        proc = subprocess.Popen(tabix_command, stdout=subprocess.PIPE)
+        proc = Popen(tabix_command, stdout=PIPE)
         freq_dict = {}
         (out, err) = proc.communicate()
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
             line = line.split('\t')
-            #sys.stderr.write(str(line))
             freq_dict[line[3]] = line
 
         return self.freq_out_to_json(freq_dict)
@@ -172,7 +168,7 @@ class FreqTable(object):
         helper function to read coords file and return dict of
         lat lons...
         '''
-        with open(data_files[self.dataset]['data_dir']+data_files[self.dataset]['coordinates'], 'r') as coordinate_file:
+        with open(data_files[self.dataset]['data_dir'] + data_files[self.dataset]['coordinates'], 'r') as coordinate_file:
             lon_lat_dict = {}
             coordinate_file.next()
             for line in coordinate_file:
@@ -186,29 +182,30 @@ class FreqTable(object):
         helper function to add freqscale to json
         '''
         maxfreq=0
+
+
         for i in range(0,len(json_data)):
             if json_data[i]['rawfreq']>maxfreq:
                 maxfreq=json_data[i]['rawfreq']
-        if maxfreq<0.0001:
-            for i in range(0,len(json_data)):
-                json_data[i]['freq']=[json_data[i]['rawfreq']*10000,1-json_data[i]['rawfreq']*10000]
-                json_data[i]['freqscale']=0.0001
-        elif maxfreq<0.001:
-            for i in range(0,len(json_data)):
-                json_data[i]['freq']=[json_data[i]['rawfreq']*1000,1-json_data[i]['rawfreq']*1000]
-                json_data[i]['freqscale']=0.001
-        elif maxfreq<0.01:
-            for i in range(0,len(json_data)):
-                json_data[i]['freq']=[json_data[i]['rawfreq']*100,1-json_data[i]['rawfreq']*100]
-                json_data[i]['freqscale']=0.01
-        elif maxfreq<0.1:
-            for i in range(0,len(json_data)):
-                json_data[i]['freq']=[json_data[i]['rawfreq']*10,1-json_data[i]['rawfreq']*10]
-                json_data[i]['freqscale']=0.1
+        if maxfreq < 0.0001:
+            freqscale = 0.0001
+            freq_mult = 10000
+        elif maxfreq < 0.001:
+            freqscale = 0.001
+            freq_multi = 1000
+        elif maxfreq < 0.01:
+            freqscale = 0.01
+            freq_multi = 1000
+        elif maxfreq < 0.1:
+            freqscale = 0.1
+            freq_multi = 10
         else:
-            for i in range(0,len(json_data)):
-                json_data[i]['freq']=[json_data[i]['rawfreq'],1-json_data[i]['rawfreq']]
-                json_data[i]['freqscale']=1
+            freqscale = 1
+            freq_multi = 1
+
+        for i in range(0,len(json_data)):
+            json_data[i]['freq']=[json_data[i]['rawfreq']*freq_mult,1-json_data[i]['rawfreq']*freq_mult]
+            json_data[i]['freqscale']=freqscale
 
         return json_data
 
