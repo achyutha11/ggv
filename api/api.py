@@ -8,7 +8,7 @@ import httplib2
 import sys
 import json
 from pyliftover import LiftOver
-
+import requests
 '''
 A simple API to extract Fst and Freq info from tabix-accessible files
 John Novembre and Joe Marcus
@@ -101,11 +101,10 @@ class FreqTable(object):
         tabix_snp_pos = str(chr)+':'+str(pos)+'-'+str(pos)
         tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
         out, err = subprocess.Popen(tabix_command, stdout=subprocess.PIPE).communicate()
-        if err:
-            return err
         freq_dict = {}
         freq_list = out.strip('\n').split('\n')
         for line in freq_list:
+            print(line)
             line = line.split('\t')
             freq_dict[line[3]] = line
 
@@ -114,11 +113,9 @@ class FreqTable(object):
     def get_by_rsID(self, rsID):
         '''
         '''
-        rest_command = "curl 'http://grch37.rest.ensembl.org/variation/human/"+rsID+"?' -H 'Content-type:application/json'"
-        proc = subprocess.Popen(rest_command, stdout=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        rsID_data = json.loads(out)
-        snp_pos = str(rsID_data['mappings'][0]['location'])
+        url = "http://grch37.rest.ensembl.org/variation/human/" + rsID
+        rsID = requests.get(url, headers = {"Content-type": "application/json"}).json()
+        snp_pos = str(rsID['mappings'][0]['location'])
         chr = snp_pos.split(':')[0]
         if data_files[self.dataset]['multiple_chr']:
             tabix_snp_pos = snp_pos

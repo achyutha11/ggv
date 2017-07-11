@@ -174,3 +174,11 @@ footer #text{
 #legend #freqLegend, #legend #transLegend {
   text-align: center;
 }
+
+#msg-alert {
+  display: none;
+}
+
+#footer {
+  text-align: center;
+}
