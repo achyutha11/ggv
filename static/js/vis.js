@@ -117,7 +117,7 @@ freq_url = prefix + "/api/freq_table";
                     currentDataset = $('#dataset').chosen().val();
                     //$("#alert").modal('show');
                     currentVariant = $("#search").val();
-                    msg = "Error - The '" + currentDataset + "' dataset does not have the variant '" + currentVariant "'."
+                    msg = "Error - The '" + currentDataset + "' dataset does not have the variant '" + currentVariant + "'."
                     $("#msg-alert-error").text(msg);
                     $("#msg-alert").slideDown().delay(3500).slideUp();
                     //url = freq_url + '?data="' + currentDataset + '_table"&random_snp=True';
