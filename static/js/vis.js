@@ -1017,7 +1017,7 @@ freq_url = prefix + "/api/freq_table";
 
                 } else {
                     dataset = $('#dataset').chosen().val();
-                    variant = $('#search').val().split(':');
+                    variant = $('#search').val().split(",").join("").split(':');
                     if ($('#search').val().substring(0, 2) === 'rs') {
                         rsID = $('#search').val();
                         url = freq_url + '?data="' + dataset + '_table"&rsID=' + rsID;
