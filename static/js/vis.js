@@ -1,3 +1,7 @@
+comma = function(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 prefix = window.location.pathname
 if (prefix == "/") {
     prefix = ""
@@ -108,9 +112,14 @@ freq_url = prefix + "/api/freq_table";
             console.log('updatedata');
             return d3.json(url, function(error, data) {
                 console.log(data);
+                console.log(error);
                 if (error) {
                     currentDataset = $('#dataset').chosen().val();
-                    $("#alert").modal('show');
+                    //$("#alert").modal('show');
+                    currentVariant = $("#search").val();
+                    msg = "Error - The '" + currentDataset + "' dataset does not have the variant '" + currentVariant "'."
+                    $("#msg-alert-error").text(msg);
+                    $("#msg-alert").slideDown().delay(3500).slideUp();
                     //url = freq_url + '?data="' + currentDataset + '_table"&random_snp=True';
                     //return d3.json(url, function(error, data) {
                     //  currentNodes = setupNodes(data);
@@ -250,7 +259,7 @@ freq_url = prefix + "/api/freq_table";
             } else {
                 build = 'hg18';
             }
-            $('#variant h2').html(("<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + build + "&position=chr" + chr + "%3A" + pos + "-" + pos + "' target='_blank'>chr" + coords + "</a>") + (" <span style='color:" + minColor + "'>" + alleles[0] + "</span>/<span style='color: " + majColor + "'>" + alleles[1] + "</span>"));
+            $('#variant h2').html(("<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + build + "&position=chr" + chr + "%3A" + pos + "-" + pos + "' target='_blank'>chr" + chr + ":" + comma(pos) + "</a>") + (" <span style='color:" + minColor + "'>" + alleles[0] + "</span>/<span style='color: " + majColor + "'>" + alleles[1] + "</span>"));
             console.log(coords);
 
             $(document).trigger("updateWindow", [coords]); // added by Alex Mueller 7/11/16 to update brush
@@ -947,7 +956,6 @@ freq_url = prefix + "/api/freq_table";
                 console.log(initapiquery);
 
                 if (error) {
-                    $("#alert").modal('show');
                     console.log('Error with initial API query.');
                     urldataset = defaultdataset;
 
