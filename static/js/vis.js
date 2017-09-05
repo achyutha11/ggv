@@ -877,6 +877,16 @@ freq_url = prefix + "/api/freq_table";
             'dataset': 'POPRES_Euro',
             'build': 'hg19',
             'view': 'europe'
+        },
+        {
+            'dataset': 'PAGE-broad',
+            'build': 'hg19',
+            'view': 'global'
+        },
+        {
+            'dataset': 'PAGE-fine',
+            'build': 'hg19',
+            'view': 'global'
         }];
         //{
         ///    'dataset': 'HGDPimputedto1000genomes',

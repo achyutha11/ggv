@@ -9,6 +9,7 @@ import sys
 import json
 from pyliftover import LiftOver
 import requests
+import re
 '''
 A simple API to extract Fst and Freq info from tabix-accessible files
 John Novembre and Joe Marcus
@@ -77,7 +78,16 @@ data_files = {
         'file_end':'.srt.uniq.gz',
         'random_end':'.snps.txt',
         'pop_file':'POPRES_euro_pops.txt',
-        'coordinates':'POPRES_euro_coordinates.txt',
+        'coordinates':'coordinates.tsv',
+        'multiple_chr':True
+    },
+    '"PAGE-broad_table"':{
+        'data_dir':'/var/www/dev-integrated/data/Stanford-2017-07-26/PAGE-major/',
+        'file_base':'PAGE-major.',
+        'file_end':'.tsv.gz',
+        'random_end':'.snps.tsv',
+        'pop_file':'PAGE.MajorPopulations.Coordinates.2017Jul19.txt',
+        'coordinates':'coordinates.tsv',
         'multiple_chr':True
     }
 }
@@ -147,7 +157,7 @@ class FreqTable(object):
             snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['random_file']
         snp_proc = subprocess.Popen('shuf -n 1 '+snp_filename, stdout=subprocess.PIPE, shell=True)
         (snp_out, snp_err) = snp_proc.communicate()
-        arg_list = snp_out.strip('\n').split(' ')
+        arg_list = re.split(' |\t', snp_out.strip('\n'))
         tabix_snp_pos = arg_list[0]+':'+arg_list[1]+'-'+arg_list[1]
 
         if data_files[self.dataset]['multiple_chr']:
@@ -176,7 +186,7 @@ class FreqTable(object):
             lon_lat_dict = {}
             coordinate_file.next()
             for line in coordinate_file:
-                line = line.strip('\n').split(' ')
+                line = re.split(' |\t', line.strip('\n'))
                 lon_lat_dict[line[0]] = [line[1], line[2]]
 
         return lon_lat_dict
