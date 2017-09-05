@@ -3,6 +3,7 @@ import re
 import time
 import requests
 from ggv.app import app
+from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
 
@@ -35,20 +36,6 @@ def handle_invalid_usage(error):
     response.status_code = error.status_code
     return response
 
-def boolify(s):
-    if s == 'True':
-        return True
-    if s == 'False':
-        return False
-    raise ValueError("huh?")
-
-def autoconvert(s):
-    for fn in (boolify, int, float):
-        try:
-            return fn(s)
-        except ValueError:
-            pass
-    return s
 
 def _resolve_dataset_tabix(dataset):
     return base_path + datasets[dataset]['tabix']
@@ -73,29 +60,41 @@ def _resolve_rsid(rsID):
             rs_info['region'] = "{chrom}:{start}-{end}".format(**locals())
         return rs_info
 
-def freq_out_to_json(self, freq_dict):
-        '''
-        writes json data
-        '''
-        json_data =[]
-        lon_lat_dict = self.get_lon_lat_dict()
-        for pop in freq_dict.keys():
-            map_pos = lon_lat_dict[pop]
-            nobs =  freq_dict[pop][6]
-            xobs = freq_dict[pop][7]
-            freq = freq_dict[pop][8]
-            chr_pos = str(freq_dict[pop][0])+':'+str(freq_dict[pop][1])
-            alleles = [freq_dict[pop][4], freq_dict[pop][5]]
-            if int(nobs) == 0:
-                nobs = 'M'
-                xobs = 'M'
-            json_data.append({'pop':pop, 'pos':map_pos, 'nobs':nobs,
-                              'rawfreq':float(freq), 'chrom_pos':chr_pos, 'alleles':alleles,
-                              'xobs':xobs})
 
-            json_data = self.define_freqscale(json_data)
+def _load_population_coords(dataset):
+    coord_filename = base_path + datasets[dataset]['coordinates']
+    coords = open(coord_filename, 'r').read().splitlines()
+    coords = [re.split(" |\t", x) for x in coords if not x.startswith("#") and x]
+    coords = {x[0]: map(autoconvert, [x[1], x[2]]) for x in coords}
+    return coords
 
-        return json_data
+def _determine_freq_scale():
+    pass
+
+#def freq_out_to_json(self, freq_dict):
+#        '''
+#        writes json data
+#        '''
+#        json_data =[]
+#        lon_lat_dict = self.get_lon_lat_dict()
+#        for pop in freq_dict.keys():
+#            map_pos = lon_lat_dict[pop]
+#            nobs =  freq_dict[pop][6]
+#            xobs = freq_dict[pop][7]
+#            freq = freq_dict[pop][8]
+#            chr_pos = str(freq_dict[pop][0])+':'+str(freq_dict[pop][1])
+#            alleles = [freq_dict[pop][4], freq_dict[pop][5]]
+#            if int(nobs) == 0:
+#                nobs = 'M'
+#                xobs = 'M'
+#            json_data.append({'pop':pop,
+#                    'pos':map_pos, 'nobs':nobs,
+#                              'rawfreq':float(freq), 'chrom_pos':chr_pos, 'alleles':alleles,
+#                              'xobs':xobs})
+#
+#            json_data = self.define_freqscale(json_data)
+#
+#        return json_data
 
 def tabix_region(path, region):
     tabix_command = ['tabix', path, region]
@@ -120,8 +119,8 @@ def fetch_variant(dataset, region):
         region = "{chrom}:{start}-{start}".format(**locals())
 
     # Put together the region
+    coords = _load_population_coords(dataset)
     full_path = _resolve_dataset_tabix(dataset)
-    
     results = list(tabix_region(full_path, region))
     if not results:
         err_msg = "Variant at position '{}' not found".format(region)
@@ -131,7 +130,6 @@ def fetch_variant(dataset, region):
     for line in results:
         response = {}
         line = line.strip().split()
-        print(line)
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:10]
         response['chrom_pos'] = '{}:{}'.format(chrom, pos)
         response['alleles'] = [ref, alt]
@@ -139,6 +137,7 @@ def fetch_variant(dataset, region):
         response['nobs'] = n_obs
         response['rawfreq'] = freq
         response['pop'] = pop
+        response['pos'] = coords[pop]
         response['rsID'] = rsID
         response_json.append(response)
 
