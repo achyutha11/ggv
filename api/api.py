@@ -151,16 +151,10 @@ class FreqTable(object):
             snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['random_end']
         else:
             snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['random_file']
-<<<<<<< HEAD
-        snp_proc = subprocess.Popen('shuf -n 1 '+snp_filename, stdout=subprocess.PIPE, shell=True)
-        (snp_out, snp_err) = snp_proc.communicate()
-        arg_list = re.split(' |\t', snp_out.strip('\n'))
-=======
         comm = ['shuf', '-n', 1, snp_filename]
         snp_proc = Popen(comm, stdout=PIPE)
         snp_out, snp_err = snp_proc.communicate()
         arg_list = snp_out.strip('\n').split(' ')
->>>>>>> 03d5a55d75faca737db202f8c95764c91aea0b3b
         tabix_snp_pos = arg_list[0]+':'+arg_list[1]+'-'+arg_list[1]
 
         if data_files[self.dataset]['multiple_chr']:
