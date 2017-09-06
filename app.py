@@ -24,8 +24,9 @@ app.config["APPLICATION_ROOT"] = "/dev-integrated"
 app.config['STATIC_FOLDER'] = 'static'
 
 # Load configuration
-app.config['YAML_CONFIG'] = yaml.load(open("config.yaml", 'r').read())
 app.config['HERE'] = os.path.dirname(os.path.realpath(__file__))
+config_yaml = os.path.join(app.config['HERE'], "config.yaml")
+app.config['YAML_CONFIG'] = yaml.load(open(config_yaml, 'r').read())
 
 @app.route('/')
 def root():
