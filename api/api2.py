@@ -110,6 +110,7 @@ def _define_freqscale(freq):
 
 def tabix_region(path, region):
     tabix_command = ['tabix', path, region]
+    app.logger.info(tabix_command)
     proc = Popen(tabix_command, stdout=PIPE)
     for line in proc.stdout:
         yield line
