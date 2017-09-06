@@ -1,5 +1,5 @@
 #!/usr/env/bin python
-import ggv
+
 from api.api import FreqVcfTable
 from flask import Flask, send_from_directory, request, render_template
 from flask.ext.restful import Api
@@ -8,6 +8,9 @@ import logging
 import yaml
 from logging.handlers import RotatingFileHandler
 import os
+
+import logging
+from logging.handlers import RotatingFileHandler
 
 
 
@@ -44,8 +47,17 @@ api.add_resource(FreqVcfTable, '/api/freq_table')
 api.decorators = [cors.crossdomain(origin='*')]
 
 # Dev of new API
-from ggv.api import *
+from api import *
 
 if __name__ == '__main__':
     app.debug = True
+    formatter = logging.Formatter(
+        "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
+    handler = RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
+    handler.setLevel(logging.DEBUG)
+    handler.setFormatter(formatter)
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.DEBUG)
+    log.addHandler(handler)
+    app.logger.addHandler(handler)
     app.run()
