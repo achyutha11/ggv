@@ -10,7 +10,7 @@ application = DebuggedApplication(application, True)
 
 formatter = logging.Formatter(
     "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
-handler = RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
+handler = logging.handlers.RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
 handler.setLevel(logging.DEBUG)
 handler.setFormatter(formatter)
 log = logging.getLogger('werkzeug')
