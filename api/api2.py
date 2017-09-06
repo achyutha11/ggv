@@ -47,12 +47,12 @@ def _resolve_rsid(rsID):
     url = "http://grch37.rest.ensembl.org/variation/human/" + rsID
     r = requests.get(url,
                      headers={"Content-type": "application/json"})
-
-    rs_info = r.json()['mappings'][0]
+    rs_info = r.json()
+    mapping = r.json()['mappings'][0]
     if r.status_code != 200:
         raise Exception("rsID not found")
     else:
-        region = rs_info['location']
+        region = mapping['location']
         chrom = region.split(":")[0]
         start = region.split(":")[1].split("-")[0]
         end = region.split(":")[1].split("-")[1]
@@ -120,13 +120,16 @@ def tabix_region(path, region):
 def fetch_variant(dataset, region):
 
     full_path = _resolve_dataset_tabix(dataset)
+    check_rs = False # Used to verify rs identifiers.
 
     if region == 'random':
         line = _random_line(full_path)
         chrom, pos = line.split("\t")[0:2]
         region = "{}:{}-{}".format(chrom, pos, pos)
     elif region.startswith("rs"):
+        rs_search = region
         rs_info = _resolve_rsid(region)
+        check_rs = rs_info['synonyms'] + [rs_info['name']]
         region = rs_info['region']
     else:
         # Check that region is properly formatted
@@ -150,6 +153,13 @@ def fetch_variant(dataset, region):
         response = {}
         line = line.strip().split()
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:10]
+
+        # Verify rsID
+        if check_rs:
+            if rsID not in check_rs:
+                err_msg = "rsID '{}' not found".format(rs_search)
+                raise InvalidUsage(err_msg, status_code=400)
+
         response['chrom_pos'] = '{}:{}'.format(chrom, pos)
         response['alleles'] = [ref, alt]
         response['xobs'] = x_obs
