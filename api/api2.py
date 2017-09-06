@@ -1,7 +1,9 @@
 import os
 import re
-import time
+import random
+import gzip
 import requests
+import math
 from ggv.app import app
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
@@ -65,36 +67,46 @@ def _load_population_coords(dataset):
     coord_filename = base_path + datasets[dataset]['coordinates']
     coords = open(coord_filename, 'r').read().splitlines()
     coords = [re.split(" |\t", x) for x in coords if not x.startswith("#") and x]
-    coords = {x[0]: map(autoconvert, [x[1], x[2]]) for x in coords}
+    coords = {x[0]: map(autoconvert, [x[2], x[1]]) for x in coords}
     return coords
 
-def _determine_freq_scale():
-    pass
 
-#def freq_out_to_json(self, freq_dict):
-#        '''
-#        writes json data
-#        '''
-#        json_data =[]
-#        lon_lat_dict = self.get_lon_lat_dict()
-#        for pop in freq_dict.keys():
-#            map_pos = lon_lat_dict[pop]
-#            nobs =  freq_dict[pop][6]
-#            xobs = freq_dict[pop][7]
-#            freq = freq_dict[pop][8]
-#            chr_pos = str(freq_dict[pop][0])+':'+str(freq_dict[pop][1])
-#            alleles = [freq_dict[pop][4], freq_dict[pop][5]]
-#            if int(nobs) == 0:
-#                nobs = 'M'
-#                xobs = 'M'
-#            json_data.append({'pop':pop,
-#                    'pos':map_pos, 'nobs':nobs,
-#                              'rawfreq':float(freq), 'chrom_pos':chr_pos, 'alleles':alleles,
-#                              'xobs':xobs})
-#
-#            json_data = self.define_freqscale(json_data)
-#
-#        return json_data
+def _random_line(file_name):
+    """
+        Reads a random line from a gzip file.
+    """
+    total_bytes = os.stat(file_name).st_size 
+    random_point = random.randint(0, total_bytes)
+    file = gzip.open(file_name)
+    file.seek(random_point)
+    file.readline() # skip this line to clear the partial line
+    return file.readline()
+
+def _define_freqscale(freq):
+    '''
+    helper function to determine frequency scale
+    '''
+    
+    # Determine max frequency
+    if freq > 0:
+        pw = math.ceil(math.log(freq, 10))
+        if pw < -4.0:
+            pw = -4.0
+    else:
+        pw = 0
+
+    freq_scale = {-4: [0.0001, 10000],
+                  -3: [0.001, 1000],
+                  -2: [0.01, 1000],
+                  -1: [0.1, 10],
+                  0: [1,1]}
+
+    return freq_scale[pw]
+
+    #for i in range(0,len(json_data)):
+    #    json_data[i]['freq']=[json_data[i]['rawfreq']*freq_mult,1-json_data[i]['rawfreq']*freq_mult]
+    #    json_data[i]['freqscale']=freqscale
+
 
 def tabix_region(path, region):
     tabix_command = ['tabix', path, region]
@@ -103,9 +115,17 @@ def tabix_region(path, region):
         yield line
 
 
+
 @app.route("/api/variant/<string:dataset>/<string:region>", methods=['GET'])
 def fetch_variant(dataset, region):
-    if region.startswith("rs"):
+
+    full_path = _resolve_dataset_tabix(dataset)
+
+    if region == 'random':
+        line = _random_line(full_path)
+        chrom, pos = line.split("\t")[0:2]
+        region = "{}:{}-{}".format(chrom, pos, pos)
+    elif region.startswith("rs"):
         rs_info = _resolve_rsid(region)
         region = rs_info['region']
     else:
@@ -120,7 +140,6 @@ def fetch_variant(dataset, region):
 
     # Put together the region
     coords = _load_population_coords(dataset)
-    full_path = _resolve_dataset_tabix(dataset)
     results = list(tabix_region(full_path, region))
     if not results:
         err_msg = "Variant at position '{}' not found".format(region)
@@ -140,6 +159,13 @@ def fetch_variant(dataset, region):
         response['pos'] = coords[pop]
         response['rsID'] = rsID
         response_json.append(response)
+
+    max_freq = max([x['rawfreq'] for x in response_json])
+    freq_scale, freq_multi = _define_freqscale(max_freq)
+    for row in response_json:
+        row['freqscale'] = freq_scale
+        row['freq'] = [row['rawfreq'] * freq_multi,
+                       1.0 - (row['rawfreq'] * freq_multi)]
 
     return jsonify(response_json)
 
