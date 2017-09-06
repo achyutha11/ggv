@@ -1,10 +1,10 @@
 import sys
-import os
+from os.path import dirname, realpath
 import logging
 
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+sys.path.insert(0, dirname(dirname(realpath(__file__))))
 
-from app import app as application
+from ggv.app import app as application
 from werkzeug.debug import DebuggedApplication 
 application = DebuggedApplication(application, True)
 
