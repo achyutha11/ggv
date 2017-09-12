@@ -75,18 +75,19 @@ def _random_line(file_name):
     """
         Reads a random line from a gzip file.
     """
-    total_bytes = os.stat(file_name).st_size 
+    total_bytes = os.stat(file_name).st_size
     random_point = random.randint(0, total_bytes)
     file = gzip.open(file_name)
     file.seek(random_point)
-    file.readline() # skip this line to clear the partial line
+    file.readline()  # skip this line to clear the partial line
     return file.readline()
+
 
 def _define_freqscale(freq):
     '''
     helper function to determine frequency scale
     '''
-    
+
     # Determine max frequency
     if freq > 0:
         pw = math.ceil(math.log(freq, 10))
@@ -99,8 +100,7 @@ def _define_freqscale(freq):
                   -3: [0.001, 1000],
                   -2: [0.01, 1000],
                   -1: [0.1, 10],
-                  0: [1,1]}
-
+                  0: [1, 1]}
     return freq_scale[pw]
 
     #for i in range(0,len(json_data)):
@@ -114,7 +114,6 @@ def tabix_region(path, region):
     proc = Popen(tabix_command, stdout=PIPE)
     for line in proc.stdout:
         yield line
-
 
 
 @app.route("/api/variant/<string:dataset>/<string:region>", methods=['GET'])
