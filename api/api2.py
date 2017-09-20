@@ -4,15 +4,12 @@ import random
 import gzip
 import requests
 import math
-from ggv.app import app
+from ggv.app import app, datasets, base_path, HERE
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
 
-YAML_CONFIG = app.config['YAML_CONFIG']
-HERE = app.config['HERE']
-datasets = YAML_CONFIG['datasets']
-base_path = HERE + YAML_CONFIG['base_path']
+
 
 #
 # Error handling
@@ -67,7 +64,7 @@ def _load_population_coords(dataset):
     coord_filename = base_path + datasets[dataset]['coordinates']
     coords = open(coord_filename, 'r').read().splitlines()
     coords = [re.split(" |\t", x) for x in coords if not x.startswith("#") and x]
-    coords = {x[0]: map(autoconvert, [x[2], x[1]]) for x in coords}
+    coords = {x[0].strip("*"): map(autoconvert, [x[1], x[2]]) for x in coords}
     return coords
 
 
@@ -153,6 +150,9 @@ def fetch_variant(dataset, region):
         response = {}
         line = line.strip().split()
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:10]
+
+        # Strip '*' from pop names.
+        pop = pop.strip("*")
 
         # Verify rsID
         if check_rs:

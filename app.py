@@ -28,9 +28,17 @@ app.config['HERE'] = os.path.dirname(os.path.realpath(__file__))
 config_yaml = os.path.join(app.config['HERE'], "config.yaml")
 app.config['YAML_CONFIG'] = yaml.load(open(config_yaml, 'r').read())
 
+# Define vars
+HERE = app.config['HERE']
+YAML_CONFIG = app.config['YAML_CONFIG']
+datasets = YAML_CONFIG['datasets']
+base_path = HERE + YAML_CONFIG['base_path']
+
 @app.route('/')
-def root():
-    return render_template('index.html')
+@app.route('/<string:dataset>/<string:chr_pos>')
+def root(dataset = "", chr_pos = ""):
+    datasets = YAML_CONFIG['datasets']
+    return render_template('index.html', **locals())
 
 
 

@@ -1,3 +1,5 @@
 Flask==0.12.1
 pyLiftover==0.3
 pyyaml==3.12
+flasl_restful==0.3.6
+requests==2.18.4
