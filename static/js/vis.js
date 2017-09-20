@@ -164,12 +164,11 @@ FreqMap = function() {
 
                         base_layer.selectAll('.map-path')
                                   .attr('d', path);
-                        console.log(vis.selectAll('.countries')[0]);
 
                         d3.json('/static/data/world-50m.json', function(error, world) {
                             countries = topojson.feature(world, world.objects.countries);
-                            vis.selectAll('.countries').attr('d', '');
-                            vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
+                            base_layer.selectAll('.countries').attr('d', '');
+                            base_layer.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
                                 'd': path,
                                 'fill': '#aaa'
                             });

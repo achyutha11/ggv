@@ -156,7 +156,8 @@ def fetch_variant(dataset, region):
 
 
         if rs_looked_up is False:
-            rs_info = _resolve_rsid(rsID)
+            if rsID.startswith("rs"):
+                rs_info = _resolve_rsid(rsID)
             rs_looked_up = True
 
         # Strip '*' from pop names.
