@@ -56,7 +56,7 @@ FreqMap = function() {
         return function(selection, data) {
             map_area = _datasets[get_current_dataset()].map_area
             draw_map(map_area)
-            
+            console.log(data);
             currentNodes = setupNodes(data);
             currentLinks = setupLinks(currentNodes);
 
@@ -224,7 +224,7 @@ FreqMap = function() {
                 $("#msg-alert-error").text(msg);
                 $("#msg-alert").slideDown().delay(3500).slideUp();
             } else {
-                currentNodes = setupNodes(data);
+                currentNodes = setupNodes(data['data']);
                 currentLinks = setupLinks(currentNodes);
                 vis.selectAll('.node').remove();
                 console.log(currentNodes);
@@ -768,86 +768,20 @@ FreqMap = function() {
     });
 
 
+    // Toggles charged layout
     activate = function(group, link) {
         d3.selectAll("#" + group + " a").classed("active", false);
         return d3.select("#" + group + " #" + link).classed("active", true);
     };
 
-    // Main page functions
-
-
-
-    var dropDown, options, plot, test_dd, schemes, locations, schemeOpts;
-    test_dd = [{
-        'dataset': '1000genomes',
-        'build': 'hg19',
-        'view': 'global'
-    }, {
-        'dataset': '1000genomes_superpops',
-        'build': 'hg19',
-        'view': 'global'
-    }, {
-        'dataset': 'ExAC',
-        'build': 'hg19',
-        'view': 'global'
-    }, {
-        'dataset': 'POPRES_Euro',
-        'build': 'hg19',
-        'view': 'europe'
-    },
-    {
-        'dataset': 'PAGE-broad',
-        'build': 'hg19',
-        'view': 'global'
-    },
-    {
-        'dataset': 'PAGE-fine',
-        'build': 'hg19',
-        'view': 'global'
-    }];
-    //{
-    ///    'dataset': 'HGDPimputedto1000genomes',
-    //    'build': 'hg19',
-    //    'view': 'global'
-    //  }
     plot = FreqMap();
     activate("layouts", 'true');
-    dropDown = d3.select("#datasets").append("select").attr("id", "dataset").attr('class', 'chosen');
-    options = dropDown.selectAll("option").data(test_dd).enter().append("option");
-    options.text((function(_this) {
-        return function(d) {
-            return "" + d.dataset + " (" + d.build + ")";
-        };
-    })(this)).attr("value", (function(_this) {
-        return function(d) {
-            return d.dataset;
-        };
-    })(this));
-    $(".chosen").chosen();
 
-    d3.select('#datasets').append('a').attr('id', 'dataLink').html("<i id='linkIcon' class='fa fa-external-link'></i>");
-
-    setDataLink = function() {
-        dataset = $('#dataset').chosen().val();
-        if (dataset === '1000genomes') {
-            $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
-        } else if (dataset === '1000genomes_superpops') {
-            $('#dataLink').attr("href", "http://www.1000genomes.org/").attr('target', '_blank');
-        } else if (dataset === 'HGDP') {
-            $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
-        } else if (dataset === 'HGDPimputedto1000genomes') {
-            $('#dataLink').attr("href", "http://www.hagsc.org/hgdp/files.html").attr('target', '_blank');
-        } else if (dataset === 'ExAC') {
-            $('#dataLink').attr("href", "http://exac.broadinstitute.org").attr('target', '_blank');
-        } else if (dataset === 'POPRES_Euro') {
-            $('#dataLink').attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/18760391").attr('target', '_blank');
-        }
-        $("#dataset").trigger("chosen:updated");
-    }
 
 
     d3.json(get_query_url("random"), function(data) {
-            plot('#vis', data);
+            console.log(data);
+            plot('#vis', data['data']);
     });
 
 
@@ -863,8 +797,7 @@ FreqMap = function() {
     $('#dataset').change(function() {
         // Update Map projection
         map_area = _datasets[get_current_dataset()].map_area
-        console.log(map_area)
-        draw_map(map_area)
+        draw_map(map_area);
         plot.update_data(get_query_url("random"));
     });
 
@@ -872,7 +805,7 @@ FreqMap = function() {
 
     // Bind random variant
     d3.select('#random').on("click", function() {
-        return plot.update_data(get_query_url("random"));
+        plot.update_data(get_query_url("random"));
     });
 
 

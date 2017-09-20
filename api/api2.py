@@ -118,6 +118,8 @@ def fetch_variant(dataset, region):
 
     full_path = _resolve_dataset_tabix(dataset)
     check_rs = False # Used to verify rs identifiers.
+    rs_looked_up = False
+    rs_info = None
 
     if region == 'random':
         line = _random_line(full_path)
@@ -126,6 +128,7 @@ def fetch_variant(dataset, region):
     elif region.startswith("rs"):
         rs_search = region
         rs_info = _resolve_rsid(region)
+        rs_looked_up = True
         check_rs = rs_info['synonyms'] + [rs_info['name']]
         region = rs_info['region']
     else:
@@ -145,11 +148,16 @@ def fetch_variant(dataset, region):
         err_msg = "Variant at position '{}' not found".format(region)
         raise InvalidUsage(err_msg, status_code=400)
 
-    response_json = []
+    variant_response = []
     for line in results:
         response = {}
         line = line.strip().split()
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:10]
+
+
+        if rs_looked_up is False:
+            rs_info = _resolve_rsid(rsID)
+            rs_looked_up = True
 
         # Strip '*' from pop names.
         pop = pop.strip("*")
@@ -168,14 +176,19 @@ def fetch_variant(dataset, region):
         response['pop'] = pop
         response['pos'] = coords[pop]
         response['rsID'] = rsID
-        response_json.append(response)
+        variant_response.append(response)
 
-    max_freq = max([x['rawfreq'] for x in response_json])
+    max_freq = max([x['rawfreq'] for x in variant_response])
     freq_scale, freq_multi = _define_freqscale(max_freq)
-    for row in response_json:
+    for row in variant_response:
         row['freqscale'] = freq_scale
         row['freq'] = [row['rawfreq'] * freq_multi,
                        1.0 - (row['rawfreq'] * freq_multi)]
+
+    response_json = {
+        'variant': rs_info,
+        'data': variant_response
+    }
 
     return jsonify(response_json)
 
