@@ -14,17 +14,12 @@ get_query_url = function(query) {
 }
 
 
-var FreqMap, activate, root, adjustBrushCount;
-adjustBrushCount = 0;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-
 FreqMap = function() {
     width = 635; // 960
     height = 425; // 500
     currentNodes = [];
     currentLinks = [];
+    variant_data = null;
     radius = 12;
     radiusScale = d3.scale.linear().domain([0, 1]).range([5, radius * 1.5]);
     opacityScale = d3.scale.sqrt().domain([1, 30]).range([.3, 1]);
@@ -54,12 +49,12 @@ FreqMap = function() {
 
     freqMap = (function(_this) {
         return function(selection, data) {
+            // Initial Query
             map_area = _datasets[get_current_dataset()].map_area
             draw_map(map_area)
-            console.log(data);
-            currentNodes = setupNodes(data);
+            currentNodes = setupNodes(data['data']);
             currentLinks = setupLinks(currentNodes);
-
+            variant_data = data['variant']
             return update();
         };
     })(this);
@@ -77,7 +72,6 @@ FreqMap = function() {
             setLayout('true');
 
             // Clear existing vis
-                // Clear existing map
             d3.select("#vis")
                 .selectAll("*").remove();
 
@@ -224,6 +218,34 @@ FreqMap = function() {
                 $("#msg-alert-error").text(msg);
                 $("#msg-alert").slideDown().delay(3500).slideUp();
             } else {
+                ucsc_link = "<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + 
+                            ds.build + 
+                            "&position=chr" + 
+                            chr + 
+                            "%3A" + 
+                            pos + 
+                            "-" + 
+                            pos + 
+                            "' target='_blank'>chr" + 
+                            chr + ":" + comma(pos) + 
+                            "</a>"
+                rs_id = "";
+                if (data['variant']) {
+                    rs_id = " [ " +data['variant']['name'] + " ]";
+                }
+                $('#variant h2').html(ucsc_link + 
+                                      (" <span style='color:" + 
+                                        minColor + 
+                                        "'>" + 
+                                        alleles[0] + 
+                                        "</span>/<span style='color: " + 
+                                        majColor + 
+                                        "'>" + 
+                                        alleles[1] + 
+                                        "</span>" +
+                                        rs_id
+                                      ));
+
                 currentNodes = setupNodes(data['data']);
                 currentLinks = setupLinks(currentNodes);
                 vis.selectAll('.node').remove();
@@ -277,8 +299,35 @@ FreqMap = function() {
         // Set the dataset URL
         $("#dataset-url").attr('href', ds.url);
 
-        $('#variant h2').html(("<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + ds.build + "&position=chr" + chr + "%3A" + pos + "-" + pos + "' target='_blank'>chr" + chr + ":" + comma(pos) + "</a>") + (" <span style='color:" + minColor + "'>" + alleles[0] + "</span>/<span style='color: " + majColor + "'>" + alleles[1] + "</span>"));
-        console.log(coords);
+
+        // Update title
+        ucsc_link = "<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + 
+                            ds.build + 
+                            "&position=chr" + 
+                            chr + 
+                            "%3A" + 
+                            pos + 
+                            "-" + 
+                            pos + 
+                            "' target='_blank'>chr" + 
+                            chr + ":" + comma(pos) + 
+                            "</a>"
+        rs_id = "";
+        if (variant_data) {
+            rs_id = " [ " + variant_data['name'] + " ]";
+        }
+        $('#variant h2').html(ucsc_link + 
+                              (" <span style='color:" + 
+                                minColor + 
+                                "'>" + 
+                                alleles[0] + 
+                                "</span>/<span style='color: " + 
+                                majColor + 
+                                "'>" + 
+                                alleles[1] + 
+                                "</span>" +
+                                rs_id
+                              ));
 
         $(document).trigger("updateWindow", [coords]); // added by Alex Mueller 7/11/16 to update brush
 
@@ -295,8 +344,6 @@ FreqMap = function() {
         });
 
         var forceDrag = force.drag();
-
-        console.log('update');
 
         nodeG = node.enter().append("g").attr("class", "node").attr("id", function(d) {
             return "node_" + d.id;
@@ -354,6 +401,7 @@ FreqMap = function() {
             "stroke": 'white',
             "stroke-width": '1.5px'
         });
+
         piePath.data((function(_this) {
             return function(d) {
                 return pie(d.af);
@@ -549,6 +597,78 @@ FreqMap = function() {
     };
     return freqMap;
 };
+
+
+
+// Toggles charged layout
+activate = function(group, link) {
+    d3.selectAll("#" + group + " a").classed("active", false);
+    return d3.select("#" + group + " #" + link).classed("active", true);
+};
+
+plot = FreqMap();
+activate("layouts", 'true');
+
+/*
+ * 
+ *  INITIAL QUERY 
+ *
+ */
+
+d3.json(get_query_url("random"), function(data) {
+    plot('#vis', data);
+});
+
+
+d3.selectAll("#layouts a").on("click", function(d) {
+    var newLayout;
+    newLayout = d3.select(this).attr("id");
+    activate("layouts", newLayout);
+    return plot.toggleLayout(newLayout);
+});
+
+// Change Dataset function
+$('#dataset').change(function() {
+    // Update Map projection
+    map_area = _datasets[get_current_dataset()].map_area
+    draw_map(map_area);
+    plot.update_data(get_query_url("random"));
+});
+
+window.plot = plot;
+
+search = function(query) {
+        if (query === undefined) {
+            query = $('#search').val()
+        }
+        plot.update_data(get_query_url(query));
+}
+
+// Bind search
+$('#buttons').keyup(function(e) {
+    if (e.which === 13) {
+        search();
+    }
+});
+$('#submit').click(search);
+
+// Bind random variant
+d3.select('#random').on("click", function() {
+    plot.update_data(get_query_url("random"));
+});
+
+// Multiple SNPs
+$('#submitArea').click(function() {
+    dataTable = $('#snp_col').val().split('\n');
+    $("#slider").slider({
+        min: 0,
+        max: dataTable.length - 1,
+        step: 1,
+        slide: function(event, ui) {
+            search(dataTable[ui.value])
+        }
+    });
+});
 
 
     // Alex Mueller's P1C Functions
@@ -767,128 +887,6 @@ FreqMap = function() {
 
     });
 
-
-    // Toggles charged layout
-    activate = function(group, link) {
-        d3.selectAll("#" + group + " a").classed("active", false);
-        return d3.select("#" + group + " #" + link).classed("active", true);
-    };
-
-    plot = FreqMap();
-    activate("layouts", 'true');
-
-
-
-    d3.json(get_query_url("random"), function(data) {
-            console.log(data);
-            plot('#vis', data['data']);
-    });
-
-
-
-    d3.selectAll("#layouts a").on("click", function(d) {
-        var newLayout;
-        newLayout = d3.select(this).attr("id");
-        activate("layouts", newLayout);
-        return plot.toggleLayout(newLayout);
-    });
-
-    // Change Dataset function
-    $('#dataset').change(function() {
-        // Update Map projection
-        map_area = _datasets[get_current_dataset()].map_area
-        draw_map(map_area);
-        plot.update_data(get_query_url("random"));
-    });
-
-    window.plot = plot;
-
-    // Bind random variant
-    d3.select('#random').on("click", function() {
-        plot.update_data(get_query_url("random"));
-    });
-
-
-    $('#buttons').keyup(function(e) {
-        var chrom, dataset, pos, rsID, url, variant;
-        if (e.which === 13) {
-            if ($('#search').val() === '') {
-
-            } else {
-                dataset = $('#dataset').chosen().val();
-                variant = $('#search').val().split(",").join("").split(':');
-                if ($('#search').val().substring(0, 2) === 'rs') {
-                    rsID = $('#search').val();
-                    url = freq_url + '?data="' + dataset + '_table"&rsID=' + rsID;
-                    return plot.update_data(url);
-                } else if (variant[0].substring(0, 3) === 'chr') {
-                    chrom = variant[0].substring(3);
-                    pos = variant[1];
-                    url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
-                    return plot.update_data(url);
-                } else {
-                    chrom = variant[0];
-                    pos = variant[1];
-                    url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
-                    return plot.update_data(url);
-                }
-            }
-        }
-    });
-    $('#submit').click(function() {
-        var chrom, dataset, pos, rsID, url, variant;
-        if ($('#search').val() === '') {
-
-        } else {
-            dataset = $('#dataset').chosen().val();
-            variant = $('#search').val().split(':');
-            if ($('#search').val().substring(0, 2) === 'rs') {
-                rsID = $('#search').val();
-                url = freq_url + '?data="' + dataset + '_table"&rsID=' + rsID;
-                return plot.update_data(url);
-            } else if (variant[0].substring(0, 3) === 'chr') {
-                chrom = variant[0].substring(3);
-                pos = variant[1];
-                url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
-                return plot.update_data(url);
-            } else {
-                chrom = variant[0];
-                pos = variant[1];
-                url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos;
-                return plot.update_data(url);
-            }
-        }
-    });
-
-    $('#submitArea').click(function() {
-        var dataTable;
-        dataTable = $('#snp_col').val().split('\n');
-        return $("#slider").slider({
-            min: 0,
-            max: dataTable.length - 1,
-            step: 1,
-            slide: function(event, ui) {
-                dataset = $('#dataset').chosen().val()
-                if (dataTable[ui.value].substring(0, 2) == 'rs') {
-                    rsID = dataTable[ui.value]
-                    url = freq_url + '?data="' + dataset + '_table"&rsID=' + rsID
-                    plot.update_data(url);
-                } else if (dataTable[ui.value].substring(0, 3) == 'chr') {
-                    variant = dataTable[ui.value].split(':')
-                    chrom = variant[0].substring(3)
-                    pos = variant[1]
-                    url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
-                    plot.update_data(url);
-                } else {
-                    variant = dataTable[ui.value].split(':')
-                    chrom = variant[0]
-                    pos = variant[1]
-                    url = freq_url + '?data="' + dataset + '_table"&chr=' + chrom + '&pos=' + pos
-                    plot.update_data(url);
-                }
-            }
-        });
-    });
 
 
 // ALEX MUELLER PDF ADDITIONS 6/28/16
