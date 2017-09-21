@@ -124,7 +124,7 @@ FreqMap = function() {
 
             // Countries
             if (map_area == 'world') {
-                d3.json('/static/data/world-110m.json', function(error, world) {
+                d3.json(base_url + '/static/data/world-110m.json', function(error, world) {
                         countries = topojson.feature(world, world.objects.countries);
                         base_layer.append('path').datum(topojson.feature(world,
                                                                   world.objects.land))
@@ -164,7 +164,7 @@ FreqMap = function() {
                         base_layer.selectAll('.map-path')
                                   .attr('d', path);
 
-                        d3.json('/static/data/world-50m.json', function(error, world) {
+                        d3.json(base_url + '/static/data/world-50m.json', function(error, world) {
                             countries = topojson.feature(world, world.objects.countries);
                             base_layer.selectAll('.countries').attr('d', '');
                             base_layer.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
