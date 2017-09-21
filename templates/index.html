@@ -288,6 +288,7 @@
     _datasets = {{ datasets|tojson }}
     init_dataset = {{ dataset|tojson }};
     init_loc = {{ loc|tojson }};
+    base_url = {{ base_url|tojson }}
   </script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/vis.js') }}"></script>
 

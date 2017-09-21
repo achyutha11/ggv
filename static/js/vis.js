@@ -9,7 +9,7 @@ get_current_dataset = function() {
 
 get_query_url = function(query) {
     dataset = get_current_dataset();
-    return "/api/variant/" + dataset + "/" + query
+    return base_url + "/api/variant/" + dataset + "/" + query
 }
 
 
