@@ -309,7 +309,7 @@ FreqMap = function() {
 
         // JN added 1/11/16 to update url query
         if (history.pushState) {
-            var new_url = window.location.protocol + "//" + window.location.host + "/" + get_current_dataset() + '/' + chr + ':' + pos;
+            var new_url = window.location.protocol + "//" + window.location.host + "/" + base_url + "/" + get_current_dataset() + '/' + chr + ':' + pos;
             window.history.pushState({
                 path: new_url
             }, '', new_url);
@@ -660,8 +660,8 @@ construct_trackset = function() {
 
     variant_bed = {
         name: ds.label,
-        url: '/track' + ds.bed,
-        indexURL: '/track' + ds.bed + '.tbi',
+        url: base_url + '/track' + ds.bed,
+        indexURL: base_url + '/track' + ds.bed + '.tbi',
         color: "#aaaaaa",
         type: "annotation",
         format: 'bed'
@@ -684,8 +684,8 @@ var options = {
 
     reference: {
         id: "hg19",
-        fastaURL: "//igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
-        cytobandURL: "//igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
+        fastaURL: "http://igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
+        cytobandURL: "https://igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
     },
 
     trackDefaults: {
