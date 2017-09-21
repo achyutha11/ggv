@@ -18,13 +18,8 @@
   <link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tipsy.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-  <!--<link rel="stylesheet" href="css/Flat-UI-master/css/flat-ui.css">!-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-4.2.0/css/font-awesome.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/chosen.css') }}">
   <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/css/jquery.fileupload.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/igv/igv-1.0.8.css') }}">
 
 </head>
 
@@ -126,7 +121,7 @@
         <div class='col-sm-4'>
             <select id='dataset' class="form-control" style='width: 80%; display: inline;'>
               {% for k, v in datasets.items() %}
-                  <option {% if loop.index == 0 %}selected{% endif %} value='{{ k }}' data-url='{{ v.url }}'>{{ v.label }}</option>
+                  <option {% if k == dataset %}selected{% endif %} value='{{ k }}' data-url='{{ v.url }}'>{{ v.label }}</option>
               {% endfor %}
             </select>
             <a id='dataset-url'><span class='fa fa-external-link'></span></a>
@@ -260,25 +255,37 @@
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/jquery-1.11.0.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/colorbrewer.v1.min.js') }}"></script>
+  <!-- jQuery UI CSS -->
+  <link rel="stylesheet" type="text/css"
+        href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"/>
+
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+
+  <!-- IGV CSS -->
+  <link rel="stylesheet" type="text/css" href="https://igv.org/web/release/1.0.9/igv-1.0.9.css">
+
+  <!-- jQuery JS -->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+  <!-- IGV JS-->
+  <script type="text/javascript" src="{{ url_for('static', filename='js/igv/igv-1.0.9.js') }}"></script>
+
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.tipsy.js') }}"></script>
   <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/d3.geo.projection.v0.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/topojson.v1.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/chosen.jquery.js') }}"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
   <script src="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/js/jquery.iframe-transport.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/js/jquery.fileupload.js') }}"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/pdfkit.js')  }}"></script>
-  <!-- <script src="https://github.com/devongovett/blob-stream/releases/download/v0.1.2/blob-stream-v0.1.2.js"></script> -->
-  <script type="text/javascript" src="{{ url_for('static', filename='js/blob-stream.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='js/igv/igv-1.0.8.js') }}"></script>
+
   <script>
     {# DATASETS #}
     _datasets = {{ datasets|tojson }}
+    init_dataset = {{ dataset|tojson }};
+    init_loc = {{ loc|tojson }};
   </script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/vis.js') }}"></script>
 

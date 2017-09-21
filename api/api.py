@@ -1,257 +1,239 @@
-from flask.ext.restful import Resource, reqparse
-from subprocess import Popen, PIPE
-import random
-from pyliftover import LiftOver
-import requests
+import os
 import re
-'''
-A simple API to extract Fst and Freq info from tabix-accessible files
-John Novembre and Joe Marcus
-'''
+import random
+import gzip
+import requests
+import math
+from ggv.app import app, datasets, base_path, HERE
+from ggv.util.fn import autoconvert
+from subprocess import Popen, PIPE
+from flask import jsonify, Response, request
 
-# Define parser for arguments
-parser = reqparse.RequestParser()
-parser.add_argument('chr', type=int)
-parser.add_argument('pos', type=int)
-parser.add_argument('rsID', type=str)
-parser.add_argument('random_snp', type=bool)
-parser.add_argument('data', type=str, required=True)
 
-# Converting rsID
-lo = LiftOver('hg19', 'hg18')
+#
+# Error handling
+#
+class InvalidUsage(Exception):
+    status_code = 400
 
-# The data
-data_files = {
-    '"1000genomes_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/1000genomes_phase3_table/',
-        'file_base':'ALL.chr',
-        'file_end':'.phase3_shapeit2_mvncall_integrated.20130502.genotype.freq.gz',
-        'random_end':'.phase3_shapeit2_mvncall_integrated.20130502.genotype.snps.txt',
-        'pop_file':'1000genomes_phase3_clst.txt',
-        'coordinates':'1000genomes_phase3_coordinates.txt',
-        'multiple_chr':True
-    },
-    '"HGDPimputedto1000genomes_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/H938_imputed_table/',
-        'file_base':'hgdp_hg19_imputed_chr',
-        'file_end':'.frq.gz',
-        'random_end':'.snps',
-        'pop_file':'H938_pops_full.txt',
-        'coordinates':'H938_coordinates.txt',
-        'multiple_chr':True
-    },
-    '"HGDP_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/H938_table/',
-        'file':'H938_autoSNPs_full.freq.gz',
-        'random_file':'H938_autoSNPs_full.snps.txt',
-        'pop_file':'H938_pops_full.txt',
-        'coordinates':'H938_coordinates.txt',
-        'multiple_chr':False
-    },
-    '"ExAC_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/ExAc_table/',
-        'file_base':'ExAC_chr',
-        'file_end':'.frq.gz',
-        'random_end':'.snps.txt',
-        'pop_file':'ExAc_pops.txt',
-        'coordinates':'ExAc_coordinates.txt',
-        'multiple_chr':True
-    },
-    '"1000genomes_superpops_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/1KG_phase3_superpops_table/',
-        'file_base':'1KG_superpop_chr',
-        'file_end':'.frq.gz',
-        'random_end':'.snps.txt',
-        'pop_file':'1KG_superpop_pops.txt',
-        'coordinates':'1KG_superpop_coordinates.txt',
-        'multiple_chr':True
-    },
-    '"POPRES_Euro_table"':{
-        'data_dir':'/var/www/ggv_api/ggv_api/static/data/POPRES_EURO_hg19_table/',
-        'file_base':'POPRES_NovembreEtAl2008_autoSNPs_hg19.freq_chr',
-        'file_end':'.srt.uniq.gz',
-        'random_end':'.snps.txt',
-        'pop_file':'POPRES_euro_pops.txt',
-        'coordinates':'coordinates.tsv',
-        'multiple_chr':True
-    },
-    '"PAGE-broad_table"':{
-        'data_dir':'/var/www/dev-integrated/data/Stanford-2017-07-26/PAGE-major/',
-        'file_base':'PAGE-major.',
-        'file_end':'.tsv.gz',
-        'random_end':'.snps.tsv',
-        'pop_file':'PAGE.MajorPopulations.Coordinates.2017Jul19.txt',
-        'coordinates':'coordinates.tsv',
-        'multiple_chr':True
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
+def _resolve_dataset_tabix(dataset):
+    return base_path + datasets[dataset]['tabix']
+
+
+def _resolve_rsid(rsID):
+    url = "http://grch37.rest.ensembl.org/variation/human/" + rsID
+    r = requests.get(url,
+                     headers={"Content-type": "application/json"})
+    rs_info = r.json()
+    mapping = r.json()['mappings'][0]
+    if r.status_code != 200:
+        raise Exception("rsID not found")
+    else:
+        region = mapping['location']
+        chrom = region.split(":")[0]
+        start = region.split(":")[1].split("-")[0]
+        end = region.split(":")[1].split("-")[1]
+        if int(end) - 1 == int(start):
+            rs_info['region'] = "{chrom}:{start}-{start}".format(**locals())
+        else:
+            rs_info['region'] = "{chrom}:{start}-{end}".format(**locals())
+        return rs_info
+
+
+def _load_population_coords(dataset):
+    coord_filename = base_path + datasets[dataset]['coordinates']
+    coords = open(coord_filename, 'r').read().splitlines()
+    coords = [re.split(" |\t", x) for x in coords if not x.startswith("#") and x]
+    coords = {x[0].strip("*"): map(autoconvert, [x[1], x[2]]) for x in coords}
+    return coords
+
+
+def _random_line(file_name):
+    """
+        Reads a random line from a gzip file.
+    """
+    total_bytes = os.stat(file_name).st_size
+    random_point = random.randint(0, total_bytes)
+    file = gzip.open(file_name)
+    file.seek(random_point)
+    file.readline()  # skip this line to clear the partial line
+    return file.readline()
+
+
+def _define_freqscale(freq):
+    '''
+    helper function to determine frequency scale
+    '''
+
+    # Determine max frequency
+    if freq > 0:
+        pw = math.ceil(math.log(freq, 10))
+        if pw < -4.0:
+            pw = -4.0
+    else:
+        pw = 0
+
+    freq_scale = {-4: [0.0001, 10000],
+                  -3: [0.001, 1000],
+                  -2: [0.01, 1000],
+                  -1: [0.1, 10],
+                  0: [1, 1]}
+    return freq_scale[pw]
+
+    #for i in range(0,len(json_data)):
+    #    json_data[i]['freq']=[json_data[i]['rawfreq']*freq_mult,1-json_data[i]['rawfreq']*freq_mult]
+    #    json_data[i]['freqscale']=freqscale
+
+
+def tabix_region(path, region):
+    chrom, start_end = region.split(":")
+    start, end = map(int, start_end.split("-"))
+    end = end + 1
+    region = "{chrom}:{start}-{end}".format(**locals())
+    tabix_command = ['tabix', path, region]
+    app.logger.info(' '.join(tabix_command))
+    proc = Popen(tabix_command, stdout=PIPE)
+    for line in proc.stdout:
+        yield line
+
+
+@app.route("/api/variant/<string:dataset>/<string:query>", methods=['GET'])
+def fetch_variant(dataset, query):
+
+    full_path = _resolve_dataset_tabix(dataset)
+    check_rs = False # Used to verify rs identifiers.
+    verify_rs = False
+    rs_looked_up = False
+    rs_info = None
+
+    if query == 'random':
+        line = _random_line(full_path)
+        chrom, pos = line.split("\t")[0:2]
+        region = "{}:{}-{}".format(chrom, pos, int(pos) + 1)
+    elif query.startswith("rs"):
+        rs_info = _resolve_rsid(query)
+        rs_looked_up = True
+        check_rs = rs_info['synonyms'] + [rs_info['name']]
+        region = rs_info['region']
+
+        # Expand the rs region but verify rs number from results.
+        chrom, start, end = re.split("[:-]",region)
+        start = int(start) - 100
+        end = int(end) + 100
+        region = "{chrom}:{start}-{end}".format(**locals())
+        verify_rs = True
+    else:
+        # Check that region is properly formatted
+        region_match = re.match('^[0-9]{1,2}:[0-9]+$', query)
+        if region_match is None:
+            err_msg = "Malformed region: '{}'".format(region)
+            raise InvalidUsage(err_msg, status_code=400)
+        region = query
+        chrom = region.split(":")[0]
+        start = region.split(":")[1]
+        region = "{chrom}:{start}-{start}".format(**locals())
+
+    # Put together the region
+    coords = _load_population_coords(dataset)
+    results = list(tabix_region(full_path, region))
+    if not results:
+        err_msg = "Variant at position '{}' not found".format(region)
+        raise InvalidUsage(err_msg, status_code=400)
+
+    variant_response = []
+    for line in results:
+        response = {}
+        line = line.strip().split()
+        chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:11]
+
+        if verify_rs:
+            if query != rsID:
+                continue
+
+        # If the rsID is in the dataset, provide it back.
+        if rs_looked_up is False:
+            if rsID.startswith("rs"):
+                rs_info = {'name': rsID}
+            rs_looked_up = True
+
+        # Strip '*' from pop names.
+        pop = pop.strip("*")
+
+        # Verify rsID
+        if check_rs:
+            if rsID not in check_rs:
+                err_msg = "rsID '{}' not found".format(query)
+                raise InvalidUsage(err_msg, status_code=400)
+
+        response['chrom_pos'] = '{}:{}'.format(chrom, pos)
+        response['alleles'] = [ref, alt]
+        response['xobs'] = x_obs
+        response['nobs'] = n_obs
+        response['rawfreq'] = freq
+        response['pop'] = pop
+        response['pos'] = coords[pop]
+        response['rsID'] = rsID
+        variant_response.append(response)
+
+    max_freq = max([x['rawfreq'] for x in variant_response])
+    freq_scale, freq_multi = _define_freqscale(max_freq)
+    for row in variant_response:
+        row['freqscale'] = freq_scale
+        row['freq'] = [row['rawfreq'] * freq_multi,
+                       1.0 - (row['rawfreq'] * freq_multi)]
+
+    # General info regarding variant
+    rs_info['chrom'], rs_info['pos'] = variant_response[0]['chrom_pos'].split(":")
+    rs_info['pos'] = int(rs_info['pos'])
+    rs_info['alleles'] = variant_response[0]['alleles']
+    response_json = {
+        'variant': rs_info,
+        'data': variant_response
     }
-}
+
+    return jsonify(response_json)
 
 
-class FreqTable(object):
-    '''
-    class for obtaining frequencies from FreqVcf Tables
-    '''
-    def __init__(self,dataset):
-        self.dataset=dataset
 
-    def get_by_chr_pos(self, chr, pos):
-        '''
-        '''
-        if data_files[self.dataset]['multiple_chr']:
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['file_end']
-        else:
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
+@app.route("/api/tabix/<string:dataset>/<string:region>", methods=['GET'])
+@app.route("/api/tabix/<string:dataset>/<string:region>/dl", methods=['GET'])
+def api_tabix_request(dataset, region):
+    """
+        Outputs raw tabix data; 
+        Optionally use 'dl' at end 
+        to download tsv.
+    """
+    if region.startswith("rs"):
+        rs_info = _resolve_rsid(region)
+        region = rs_info['location']
+        chrom = region.split(":")[0]
+        start = region.split(":")[1].split("-")[0]
+    if request.path.endswith('dl'):
+        mimetype = 'text/tab-separated-values'
+    else:
+        mimetype = 'tsv'
+    if dataset in datasets.keys():
+        full_path = _resolve_dataset_tabix(dataset)
+        return Response(tabix_region(full_path, region), mimetype=mimetype)
+    else:
+        raise InvalidUsage("Dataset '{}' not found".format(dataset), status_code=400)
 
-        tabix_snp_pos = str(chr)+':'+str(pos)+'-'+str(pos)
-        tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        out, err = Popen(tabix_command, stdout=PIPE).communicate()
-        freq_dict = {}
-        freq_list = out.strip('\n').split('\n')
-        for line in freq_list:
-            print(line)
-            line = line.split('\t')
-            freq_dict[line[3]] = line
-
-        return self.freq_out_to_json(freq_dict)
-
-    def get_by_rsID(self, rsID):
-        '''
-        '''
-        url = "http://grch37.rest.ensembl.org/variation/human/" + rsID
-        app_json_header = {"Content-type": "application/json"}
-        rsID = requests.get(url,
-                            headers=app_json_header).json()
-        snp_pos = str(rsID['mappings'][0]['location'])
-        chr = snp_pos.split(':')[0]
-        if data_files[self.dataset]['multiple_chr']:
-            tabix_snp_pos = snp_pos
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['file_end']
-        else:
-            pos = snp_pos.split('-')[1]
-            chrom = 'chr'+chr
-            lo_list = lo.convert_coordinate(chrom, int(pos))
-            tabix_snp_pos = lo_list[0][0][3:]+':'+str(lo_list[0][1])+'-'+str(lo_list[0][1])
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
-
-        tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        out, err = Popen(tabix_command, stdout=PIPE).communicate()
-        freq_dict = {}
-        freq_list = out.strip('\n').split('\n')
-        for line in freq_list:
-            line = line.split('\t')
-            freq_dict[line[3]] = line
-
-        return self.freq_out_to_json(freq_dict)
-
-    def get_random(self):
-        '''
-        '''
-        if data_files[self.dataset]['multiple_chr']:
-            chr = random.randint(1,22)
-            snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['random_end']
-        else:
-            snp_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['random_file']
-        comm = ['shuf', '-n', 1, snp_filename]
-        snp_proc = Popen(comm, stdout=PIPE)
-        snp_out, snp_err = snp_proc.communicate()
-        arg_list = snp_out.strip('\n').split(' ')
-        tabix_snp_pos = arg_list[0]+':'+arg_list[1]+'-'+arg_list[1]
-
-        if data_files[self.dataset]['multiple_chr']:
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file_base']+str(chr)+data_files[self.dataset]['file_end']
-        else:
-            vcf_filename = data_files[self.dataset]['data_dir']+data_files[self.dataset]['file']
-
-        tabix_command = ['tabix', vcf_filename, tabix_snp_pos]
-        proc = Popen(tabix_command, stdout=PIPE)
-        freq_dict = {}
-        (out, err) = proc.communicate()
-        freq_list = out.strip('\n').split('\n')
-        for line in freq_list:
-            line = line.split('\t')
-            freq_dict[line[3]] = line
-
-        return self.freq_out_to_json(freq_dict)
-
-    def get_lon_lat_dict(self):
-        '''
-        helper function to read coords file and return dict of
-        lat lons...
-        '''
-        with open(data_files[self.dataset]['data_dir'] + data_files[self.dataset]['coordinates'], 'r') as coordinate_file:
-            lon_lat_dict = {}
-            coordinate_file.next()
-            for line in coordinate_file:
-                line = re.split(' |\t', line.strip('\n'))
-                lon_lat_dict[line[0]] = [line[1], line[2]]
-
-        return lon_lat_dict
-
-    def define_freqscale(self, json_data):
-        '''
-        helper function to add freqscale to json
-        '''
-        maxfreq=0
-
-
-        for i in range(0,len(json_data)):
-            if json_data[i]['rawfreq']>maxfreq:
-                maxfreq=json_data[i]['rawfreq']
-        if maxfreq < 0.0001:
-            freqscale = 0.0001
-            freq_mult = 10000
-        elif maxfreq < 0.001:
-            freqscale = 0.001
-            freq_multi = 1000
-        elif maxfreq < 0.01:
-            freqscale = 0.01
-            freq_multi = 1000
-        elif maxfreq < 0.1:
-            freqscale = 0.1
-            freq_multi = 10
-        else:
-            freqscale = 1
-            freq_multi = 1
-
-        for i in range(0,len(json_data)):
-            json_data[i]['freq']=[json_data[i]['rawfreq']*freq_mult,1-json_data[i]['rawfreq']*freq_mult]
-            json_data[i]['freqscale']=freqscale
-
-        return json_data
-
-    def freq_out_to_json(self, freq_dict):
-        '''
-        writes json data
-        '''
-        json_data =[]
-        lon_lat_dict = self.get_lon_lat_dict()
-        for pop in freq_dict.keys():
-            map_pos = lon_lat_dict[pop]
-            nobs =  freq_dict[pop][6]
-            xobs = freq_dict[pop][7]
-            freq = freq_dict[pop][8]
-            chr_pos = str(freq_dict[pop][0])+':'+str(freq_dict[pop][1])
-            alleles = [freq_dict[pop][4], freq_dict[pop][5]]
-            if int(nobs) == 0:
-                nobs = 'M'
-                xobs = 'M'
-            json_data.append({'pop':pop, 'pos':map_pos, 'nobs':nobs,
-                              'rawfreq':float(freq), 'chrom_pos':chr_pos, 'alleles':alleles,
-                              'xobs':xobs})
-
-            json_data = self.define_freqscale(json_data)
-
-        return json_data
-
-class FreqVcfTable(Resource):
-    def get(self):
-        args=parser.parse_args()
-        f = FreqTable(args['data'])
-        if args['chr'] and args['pos']:
-            return f.get_by_chr_pos(args['chr'], args['pos'])
-        elif args['random_snp'] == True:
-            return f.get_random()
-        elif args['rsID']:
-            return f.get_by_rsID(args['rsID'])
-        else:
-            return 403

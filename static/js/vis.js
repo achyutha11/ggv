@@ -7,7 +7,6 @@ get_current_dataset = function() {
     return $("#dataset").find(":selected").val()
 }
 
-// Setup Initial Query
 get_query_url = function(query) {
     dataset = get_current_dataset();
     return "/api/variant/" + dataset + "/" + query
@@ -208,47 +207,25 @@ FreqMap = function() {
     // updates the data shown on the page
     freqMap.update_data = function(url) {
         return d3.json(url, function(error, data) {
-            console.log(data);
             if (error) {
-                console.log(error);
                 currentDataset = get_current_dataset();
                 currentVariant = $("#search").val();
                 msg = "Error - The '" + currentDataset + "' dataset does not have the variant '" + currentVariant + "'."
                 $("#msg-alert-error").text(msg);
                 $("#msg-alert").slideDown().delay(3500).slideUp();
             } else {
-                ucsc_link = "<a id='ucscLink' href='https://genome.ucsc.edu/cgi-bin/hgTracks?db=" + 
-                            ds.build + 
-                            "&position=chr" + 
-                            chr + 
-                            "%3A" + 
-                            pos + 
-                            "-" + 
-                            pos + 
-                            "' target='_blank'>chr" + 
-                            chr + ":" + comma(pos) + 
-                            "</a>"
-                rs_id = "";
-                if (data['variant']) {
-                    rs_id = " [ " +data['variant']['name'] + " ]";
-                }
-                $('#variant h2').html(ucsc_link + 
-                                      (" <span style='color:" + 
-                                        minColor + 
-                                        "'>" + 
-                                        alleles[0] + 
-                                        "</span>/<span style='color: " + 
-                                        majColor + 
-                                        "'>" + 
-                                        alleles[1] + 
-                                        "</span>" +
-                                        rs_id
-                                      ));
-
                 currentNodes = setupNodes(data['data']);
                 currentLinks = setupLinks(currentNodes);
                 vis.selectAll('.node').remove();
-                console.log(currentNodes);
+                variant_data = data['variant']
+
+                // Set IGV Coord
+                search_variant = variant_data['chrom'] + ":" + variant_data['pos'];
+                // Set search with variant
+                $("#search").val(search_variant);
+                console.log(search_variant);
+                igv.browser.search(search_variant)
+
                 return update();
             }
         });
@@ -313,7 +290,7 @@ FreqMap = function() {
                             "</a>"
         rs_id = "";
         if (variant_data) {
-            rs_id = " [ " + variant_data['name'] + " ]";
+            rs_id = " - " + variant_data['name'] + " ";
         }
         $('#variant h2').html(ucsc_link + 
                               (" <span style='color:" + 
@@ -530,7 +507,6 @@ FreqMap = function() {
         var k;
         k = e.alpha * 0.08;
         node.each(moveToPoint(e.alpha));
-        var scheme = $('#scheme').chosen().val();
         return node.attr("transform", (function(_this) {
             return function(d) {
                 // this is what drags the stems along with the nodes
@@ -614,9 +590,18 @@ activate("layouts", 'true');
  *
  */
 
-d3.json(get_query_url("random"), function(data) {
+d3.json(get_query_url(init_loc), function(data) {
     plot('#vis', data);
 });
+
+// Handle back/forth events
+window.onpopstate = function(event) {
+  path = event.state.path.split("/")
+  dataset = path[path.length - 2];
+  $("#dataset").val(dataset);
+  loc = path[path.length - 1];
+  plot.update_data(get_query_url(loc));
+};
 
 
 d3.selectAll("#layouts a").on("click", function(d) {
@@ -649,7 +634,7 @@ $('#buttons').keyup(function(e) {
         search();
     }
 });
-$('#submit').click(search);
+$('#submit').click(function() { search(); });
 
 // Bind random variant
 d3.select('#random').on("click", function() {
@@ -670,223 +655,247 @@ $('#submitArea').click(function() {
 });
 
 
-    // Alex Mueller's P1C Functions
-    $(function() {
+construct_trackset = function() {
+    ds = _datasets[get_current_dataset()]
 
-        var currentChrom = 0;
-        // div that contains the browser
+    variant_bed = {
+        name: ds.label,
+        url: '/track' + ds.bed,
+        indexURL: '/track' + ds.bed + '.tbi',
+        color: "#aaaaaa",
+        type: "annotation",
+        format: 'bed'
+    }
 
-        var browserdiv = document.getElementById("browserContainer");
-
-
-
-
-        // options for browser
-        var options = {
-
-
-            locus: '1:222087783-222087883',
-
-            reference: {
-                id: "hg19",
-                fastaURL: "//igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
-                cytobandURL: "//igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
-            },
-
-            trackDefaults: {
-                palette: ["#00A0B0", "#6A4A3C", "#CC333F", "#EB6841"],
-                bam: {
-                    coverageThreshold: 0.2,
-                    coverageQualityWeight: true
-                }
-            },
-
-            tracks: [{
-                name: "Genes",
-                url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-                index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-                displayMode: "EXPANDED",
-                color: "#aaaaaa",
-                order: 0
-            }, {
-                name: "Variants",
-                format: "vcf",
-                url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-                indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
-                type: "variant",
-                color: "#aaaaaa",
-                order: 1
-            }]
-        };
+    return [variant_bed]
+}
 
 
-        //***** ALEX'S P1C FUNCTIONS *****//
+var currentChrom = 0;
+// div that contains the browser
 
-        // creates browser instance
-        igv.createBrowser(browserdiv, options);
+var browserdiv = document.getElementById("browserContainer");
 
 
-        igv.browser.on('trackclick', function (track, popoverData) {
-            var symbol = null;
-            console.log(popoverData);
+// options for browser
+var options = {
 
-            chrom = igv.browser.$searchInput.val().split(":")[0]
-            pos = popoverData['pos'] + 1;
-            if (popoverData['data'].length > 0) {
-            console.log(urlrsID)
-            initapiquery = get_query_url(chrom + ':' + pos);
-            console.log(initapiquery);
-            window.plot.update_data(initapiquery);
+    locus: init_loc,
+
+    reference: {
+        id: "hg19",
+        fastaURL: "//igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
+        cytobandURL: "//igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
+    },
+
+    trackDefaults: {
+        palette: ["#00A0B0", "#6A4A3C", "#CC333F", "#EB6841"],
+        bam: {
+            coverageThreshold: 0.2,
+            coverageQualityWeight: true
         }
+    },
 
-            // Prevent default pop-over behavior
-            return false;
-        });
+    tracks: construct_trackset()
 
-
-        // when the user searches for a new variant, the updateWindow event is called
-        // the function below will set the IGV browser window to 10 kb around the
-        // chosen variant. this will not occur if the user clicks on a variant
-        // in the browser
-        $(document).on("updateWindow", function(event, coords) {
-
-
-            var chromosome, x, xleft, xright;
-            coords = coords.split(':');
-            chromosome = parseInt(coords[0]);
-            x = parseInt(coords[1]);
-            console.log($('#ucscLink').text());
-
-            if (x >= 5000) {
-                xleft = x - 100;
-                xright = x + 100;
-            } else {
-                xleft = 0;
-                xright = 200;
-            }
-
-            // this inputs the window into the IGV search bar
-            if (currentChrom != chromosome) {
-                $('#igvControlDiv input').val(chromosome + ':' + xleft + '-' + xright);
-            }
-
-            // this triggers the search, which then displays the proper window
-            $('#igvControlDiv .fa-search').click();
+    /*
+    [{
+        name: "Genes",
+        url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+        index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+        displayMode: "EXPANDED",
+        color: "#aaaaaa",
+        order: 0
+    }]
+    */
+};
 
 
-        })
+/*
+ *
+ *
+ * IGV Functions
+ * 
+ *
+ */
+
+// creates browser instance
+browser = igv.createBrowser(browserdiv, options);
+
+// Handle clicking on variants
+browser.on('trackclick', function (track, popoverData, pos) {
+    // Get chromosome
+    console.log(popoverData);
+    chrom = $(".igvNavigationSearchInput").val().split(":")[0];
+    // Fill Search bar
+    $("#search").val(chrom + ":" + pos);
+    search();
+    return false;
+});
 
 
-        // here are the igv.js tracks for the datasets current included in the GGV
-        // when the user switches to a new dataset, a corresponding set of tracks
-        // will be loaded
-        // unfortunately I could not find the correct VCFs for hgdp and popres datasets
-        // once they are found they can be linked to in the track data
-       var oneThousandTracks = [{
-            name: "Genes",
-            url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-            index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-            displayMode: "EXPANDED",
-            color: "#aaaaaa",
-            order: 0
-        }, {
-            name: "Variants",
-            format: "vcf",
-            url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-            indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
-            type: "variant",
-            color: "#aaaaaa",
-            order: 1
-        }];
 
-        var exacTracks = [{
-            name: "Genes",
-            url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-            index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-            displayMode: "EXPANDED",
-            color: "#aaaaaa",
-            order: 0
-        }, {
-            name: "Variants",
-            format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
-            type: "variant",
-            color: "#aaaaaa",
-            order: 1
-        }];
+/*
+igv.browser.on('trackclick', function (track, popoverData) {
+    var symbol = null;
+    console.log(popoverData);
 
-        var hgdpTracks = [{
-            name: "Genes",
-            url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-            index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-            displayMode: "EXPANDED",
-            color: "#aaaaaa",
-            order: 0
-        }, {
-            name: "Variants",
-            format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
-            type: "variant",
-            color: "#aaaaaa",
-            order: 1
-        }];
+    chrom = igv.browser.$searchInput.val().split(":")[0]
+    pos = popoverData['pos'] + 1;
+    if (popoverData['data'].length > 0) {
+    console.log(urlrsID)
+    initapiquery = get_query_url(chrom + ':' + pos);
+    console.log(initapiquery);
+    window.plot.update_data(initapiquery);
+}
 
-        var popresTracks = [{
-            name: "Genes",
-            url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-            index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-            displayMode: "EXPANDED",
-            color: "#aaaaaa",
-            order: 0
-        }, {
-            name: "Variants",
-            format: "vcf",
-            url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
-            indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
-            type: "variant",
-            color: "#aaaaaa",
-            order: 1
-        }];
+    // Prevent default pop-over behavior
+    return false;
+});
 
 
-        // Whenever the dataset is changed, the genes and variants sections are
-        // updated. This requires changing the tracks. the tracks are provided above.
-        // The info is currently not correct and all tracks contain the info for 1000genomes
-        // and should be updated soon
-        $(document).on("datasetChange", function(event, newDataset, oldDataset) {
-            if (oldDataset == newDataset) {
-                return;
-            }
-
-            // Run multiple times...unfortunately?
-            igv.browser.removeAllTracks();
-            igv.browser.removeAllTracks();
-            igv.browser.removeAllTracks();
-            
-            // sets the tracks to the new track info
-            if (newDataset == 'HGDP') {
-                var trackset = hgdpTracks;
-            } else if (newDataset == 'POPRES_Euro') {
-                var trackset = popresTracks;
-            } else if (newDataset == 'ExAC') {
-                var trackset = exacTracks;
-            } else {
-                var trackset = oneThousandTracks;
-            }
-            console.log(trackset);
-
-            // loads the new tracks
-            for (i = 0; i < trackset.length; i++) {
-                igv.browser.loadTrack(trackset[i]);
-            }
-
-        })
-
-    });
+// when the user searches for a new variant, the updateWindow event is called
+// the function below will set the IGV browser window to 10 kb around the
+// chosen variant. this will not occur if the user clicks on a variant
+// in the browser
+$(document).on("updateWindow", function(event, coords) {
 
 
+    var chromosome, x, xleft, xright;
+    coords = coords.split(':');
+    chromosome = parseInt(coords[0]);
+    x = parseInt(coords[1]);
+
+    if (x >= 5000) {
+        xleft = x - 100;
+        xright = x + 100;
+    } else {
+        xleft = 0;
+        xright = 200;
+    }
+
+    // this inputs the window into the IGV search bar
+    if (currentChrom != chromosome) {
+        $('#igvControlDiv input').val(chromosome + ':' + xleft + '-' + xright);
+    }
+
+    // this triggers the search, which then displays the proper window
+    $('#igvControlDiv .fa-search').click();
+
+
+})
+
+
+// here are the igv.js tracks for the datasets current included in the GGV
+// when the user switches to a new dataset, a corresponding set of tracks
+// will be loaded
+// unfortunately I could not find the correct VCFs for hgdp and popres datasets
+// once they are found they can be linked to in the track data
+var oneThousandTracks = [{
+    name: "Genes",
+    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+    displayMode: "EXPANDED",
+    color: "#aaaaaa",
+    order: 0
+}, {
+    name: "Variants",
+    format: "vcf",
+    url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
+    indexURL: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
+    type: "variant",
+    color: "#aaaaaa",
+    order: 1
+}];
+
+var exacTracks = [{
+    name: "Genes",
+    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+    displayMode: "EXPANDED",
+    color: "#aaaaaa",
+    order: 0
+}, {
+    name: "Variants",
+    format: "vcf",
+    url: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz",
+    indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/ExAC.r0.3.1.sites.vep.vcf.gz.tbi",
+    type: "variant",
+    color: "#aaaaaa",
+    order: 1
+}];
+
+var hgdpTracks = [{
+    name: "Genes",
+    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+    displayMode: "EXPANDED",
+    color: "#aaaaaa",
+    order: 0
+}, {
+    name: "Variants",
+    format: "vcf",
+    url: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz",
+    indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/H938_autoSNPs.sites.vcf.gz.tbi",
+    type: "variant",
+    color: "#aaaaaa",
+    order: 1
+}];
+
+var popresTracks = [{
+    name: "Genes",
+    url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+    index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+    displayMode: "EXPANDED",
+    color: "#aaaaaa",
+    order: 0
+}, {
+    name: "Variants",
+    format: "vcf",
+    url: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz",
+    indexURL: "http://popgen.uchicago.edu/ggv_sites_data/sites/POPRES_NovembreEtAl2008_autoSNPs.sites.vcf.gz.tbi",
+    type: "variant",
+    color: "#aaaaaa",
+    order: 1
+}];
+
+
+// Whenever the dataset is changed, the genes and variants sections are
+// updated. This requires changing the tracks. the tracks are provided above.
+// The info is currently not correct and all tracks contain the info for 1000genomes
+// and should be updated soon
+$(document).on("datasetChange", function(event, new_dataset, old_dataset) {
+    if (old_dataset == new_dataset) {
+        return;
+    }
+
+    // Run multiple times...unfortunately?
+    igv.browser.removeAllTracks();
+    igv.browser.removeAllTracks();
+    igv.browser.removeAllTracks();
+    
+    // sets the tracks to the new track info
+    if (new_dataset == 'HGDP') {
+        var trackset = hgdpTracks;
+    } else if (new_dataset == 'POPRES_Euro') {
+        var trackset = popresTracks;
+    } else if (new_dataset == 'ExAC') {
+        var trackset = exacTracks;
+    } else {
+        var trackset = oneThousandTracks;
+    }
+    console.log(trackset);
+
+    // loads the new tracks
+    for (i = 0; i < trackset.length; i++) {
+        igv.browser.loadTrack(trackset[i]);
+    }
+
+})
+
+
+
+*/
 
 // ALEX MUELLER PDF ADDITIONS 6/28/16
 // ALEX MUELLER ADDITIONS 6/28/16
@@ -977,7 +986,6 @@ $(function() {
 
             // ADD NODES TO MAP
             var nodePath1, nodePath2, nodeLine, transform, translate, xtranslate, ytranslate, opacity, i;
-            console.log('adding nodes');
             for (i = 0; i < nodeTotal; i++) {
                 nodeLine = $(nodes[i]).children()[0];
                 nodePath1 = $(nodes[i]).children()[1];
@@ -1047,7 +1055,6 @@ $(function() {
             doc.text('n=18', 358, 305);
             doc.text('n=27', 390, 305);
 
-            console.log('end');
             doc.end();
 
         }, 1000);
