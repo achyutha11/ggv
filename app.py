@@ -45,6 +45,9 @@ base_path = HERE + YAML_CONFIG['base_path']
 @app.route('/')
 @app.route('/<string:dataset>/<string:loc>')
 def root(dataset = "", loc = ""):
+
+    base_url = YAML_CONFIG['base_url']
+
     datasets = YAML_CONFIG['datasets']
     if not loc:
         dataset = datasets.keys()[0]
