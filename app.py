@@ -52,14 +52,14 @@ def root(dataset = "", loc = ""):
     return render_template('index.html', **locals())
 
 
-#@app.after_request
-#def after_request(response):
-#    response.headers.add('Access-Control-Allow-Origin', '*')
-#    response.headers.add('Access-Control-Allow-Headers', 'RANGE,Cache-control,If-None-Match,Content-Type,Authorization')
-#    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
-#    response.headers.add('Access-Control-Expose-Headers', 'Content-Length')
-#    response.headers.add('Accept-Ranges', 'bytes')
-#    return response
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'RANGE,Cache-control,If-None-Match,Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
+    response.headers.add('Access-Control-Expose-Headers', 'Content-Length')
+    response.headers.add('Accept-Ranges', 'bytes')
+    return response
 
 
 @app.route('/track/<path:path>')
