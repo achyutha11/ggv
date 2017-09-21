@@ -4,7 +4,7 @@ import random
 import gzip
 import requests
 import math
-from ggv.app import app, datasets, base_path, HERE
+from ggv.app import app, datasets, base_path, HERE, YAML_CONFIG
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
@@ -109,7 +109,8 @@ def tabix_region(path, region):
     start, end = map(int, start_end.split("-"))
     end = end + 1
     region = "{chrom}:{start}-{end}".format(**locals())
-    tabix_command = ['tabix', path, region]
+    tabix = YAML_CONFIG['tabix_path']
+    tabix_command = [tabix, path, region]
     app.logger.info(' '.join(tabix_command))
     proc = Popen(tabix_command, stdout=PIPE)
     for line in proc.stdout:
