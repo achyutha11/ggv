@@ -120,6 +120,7 @@ def tabix_region(path, region):
 @app.route("/api/variant/<string:dataset>/<string:query>", methods=['GET'])
 def fetch_variant(dataset, query):
 
+    query = query.replace("chr", "")
     full_path = _resolve_dataset_tabix(dataset)
     check_rs = False # Used to verify rs identifiers.
     verify_rs = False
@@ -146,7 +147,7 @@ def fetch_variant(dataset, query):
         # Check that region is properly formatted
         region_match = re.match('^[0-9]{1,2}:[0-9]+$', query)
         if region_match is None:
-            err_msg = "Malformed region: '{}'".format(region)
+            err_msg = "Malformed region: '{}'".format(query)
             raise InvalidUsage(err_msg, status_code=400)
         region = query
         chrom = region.split(":")[0]

@@ -13,6 +13,16 @@ get_query_url = function(query) {
 }
 
 
+build_path = (...args) => {
+  return args.map((part, i) => {
+    if (i === 0){
+      return part.trim().replace(/[\/]*$/g, '')
+    } else {
+      return part.trim().replace(/(^[\/]*|[\/]*$)/g, '')
+    }
+  }).filter(x=>x.length).join('/')
+}
+
 FreqMap = function() {
     width = 635; // 960
     height = 425; // 500
@@ -309,7 +319,9 @@ FreqMap = function() {
 
         // JN added 1/11/16 to update url query
         if (history.pushState) {
-            var new_url = window.location.protocol + "//" + window.location.host + "/" + base_url + "/" + get_current_dataset() + '/' + chr + ':' + pos;
+            var new_url = build_path(base_url,
+                                     get_current_dataset(),
+                                     chr + ':' + pos);
             window.history.pushState({
                 path: new_url
             }, '', new_url);
@@ -684,8 +696,6 @@ var options = {
 
     reference: {
         id: "hg19",
-        fastaURL: "http://igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
-        cytobandURL: "https://igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
     },
 
     trackDefaults: {
