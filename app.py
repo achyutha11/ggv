@@ -91,6 +91,12 @@ def send_track(path):
     rv.headers['Content-Range'] = 'bytes {0}-{1}/{2}'.format(offset, offset + length-1, size)
     return rv
 
+@app.route('/reference/<path:path>')
+def send_reference(path):
+    path = os.path.join(os.path.dirname(__file__), 'reference', path)
+    return send_file(path)
+
+
 # Dev of new API
 from api import *
 
