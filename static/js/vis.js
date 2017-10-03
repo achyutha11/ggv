@@ -234,7 +234,7 @@ FreqMap = function() {
                 // Set search with variant
                 $("#search").val(search_variant);
                 console.log(search_variant);
-                igv.browser.search(search_variant)
+                igv.browser.search(search_variant);
 
                 return update();
             }
@@ -596,6 +596,66 @@ activate = function(group, link) {
 plot = FreqMap();
 activate("layouts", 'true');
 
+
+
+setup_igv = function(init_loc) {
+
+    // options for browser
+    var options = {
+
+        locus: init_loc,
+
+        reference: {
+            id: "hg19",
+        },
+
+        trackDefaults: {
+            palette: ["#00A0B0", "#6A4A3C", "#CC333F", "#EB6841"],
+            bam: {
+                coverageThreshold: 0.2,
+                coverageQualityWeight: true
+            }
+        },
+
+        tracks: construct_trackset()
+
+        /*
+        [{
+            name: "Genes",
+            url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
+            index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
+            displayMode: "EXPANDED",
+            color: "#aaaaaa",
+            order: 0
+        }]
+        */
+    };
+
+
+    /*
+     *
+     *
+     * IGV Functions
+     * 
+     *
+     */
+
+    // creates browser instance
+    browser = igv.createBrowser(browserdiv, options);
+
+    // Handle clicking on variants
+    browser.on('trackclick', function (track, popoverData, pos) {
+        // Get chromosome
+        console.log(popoverData);
+        chrom = $(".igvNavigationSearchInput").val().split(":")[0];
+        // Fill Search bar
+        $("#search").val(chrom + ":" + pos);
+        search();
+        return false;
+    });
+
+}
+
 /*
  * 
  *  INITIAL QUERY 
@@ -603,7 +663,9 @@ activate("layouts", 'true');
  */
 
 d3.json(get_query_url(init_loc), function(data) {
+    console.log(data);
     plot('#vis', data);
+    setup_igv(data['variant']['chrom'] + ':' + data['variant']['pos'])
 });
 
 // Handle back/forth events
@@ -689,59 +751,13 @@ var currentChrom = 0;
 var browserdiv = document.getElementById("browserContainer");
 
 
-// options for browser
-var options = {
+get_init_loc_browser = function() {
+    if (init_loc == 'random') {
 
-    locus: init_loc,
-
-    reference: {
-        id: "hg19",
-    },
-
-    trackDefaults: {
-        palette: ["#00A0B0", "#6A4A3C", "#CC333F", "#EB6841"],
-        bam: {
-            coverageThreshold: 0.2,
-            coverageQualityWeight: true
-        }
-    },
-
-    tracks: construct_trackset()
-
-    /*
-    [{
-        name: "Genes",
-        url: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed",
-        index: "//igv.broadinstitute.org/annotations/hg19/genes/gencode.v18.collapsed.bed.idx",
-        displayMode: "EXPANDED",
-        color: "#aaaaaa",
-        order: 0
-    }]
-    */
-};
+    }
+}
 
 
-/*
- *
- *
- * IGV Functions
- * 
- *
- */
-
-// creates browser instance
-browser = igv.createBrowser(browserdiv, options);
-
-// Handle clicking on variants
-browser.on('trackclick', function (track, popoverData, pos) {
-    // Get chromosome
-    console.log(popoverData);
-    chrom = $(".igvNavigationSearchInput").val().split(":")[0];
-    // Fill Search bar
-    $("#search").val(chrom + ":" + pos);
-    search();
-    return false;
-});
 
 
 
