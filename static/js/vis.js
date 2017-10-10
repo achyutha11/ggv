@@ -24,8 +24,8 @@ build_path = (...args) => {
 }
 
 FreqMap = function() {
-    width = 635; // 960
-    height = 425; // 500
+    width = 1150; // 960
+    height = 600; // 500
     currentNodes = [];
     currentLinks = [];
     variant_data = null;
@@ -73,7 +73,7 @@ FreqMap = function() {
         projection = d3.geo.kavrayskiy7().rotate([-155, 0, 0]).clipExtent([
                     [3, 3],
                     [width - 3, height - 3]
-                    ]).scale(120).translate([width / 2, height / 2]);
+                    ]).scale(180).translate([width / 2, height / 2]);
 
             path = d3.geo.path().projection(projection);
             graticule = d3.geo.graticule();
@@ -413,22 +413,46 @@ FreqMap = function() {
             }
         });
         node.exit().remove();
-        $('#freqLegend h3').html("<p><i style='font-size:14px'>Frequency Scale = Proportion out of " + freqScale + "</i><br>The pie below represents a minor allele frequency of <span style='color:" + minColor + "'>" + (.25 * freqScale) + "</span></p>").css('font-size', 12);
-        legend = d3.select("#freqLegend").selectAll("svg").data(legend_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 6) + ")").attr('class', 'legendSvg');
-        legend.selectAll("path").data(pie).enter().append("path").attr("d", d3.svg.arc().innerRadius(0).outerRadius(16)).attr({
-            "fill": (function(_this) {
-                return function(d, i) {
-                    if (i === 0) {
-                        return minColor;
-                    } else {
-                        return '#fdbf6f';
-                    }
-                };
-            })(this),
-            "stroke": 'white',
-            "stroke-width": '1.5px',
-            "class": 'legslice'
-        });
+        $('#freqLegend h3').html(
+            `<p>
+            <i style='font-size:14px'>
+                Frequency Scale = Proportion out of ${freqScale}
+            </i>
+            <br>
+            The pie below represents a minor allele frequency of <span style='color: ${minColor}'>${.25 * freqScale}</span>
+            </p>`).css('font-size', 12);
+
+        legend = d3.select("#freqLegend")
+                   .selectAll("svg")
+                   .data(legend_data)
+                   .enter()
+                   .append("svg")
+                   .attr("width", radius + 50)
+                   .attr("height", radius + 50)
+                   .append("g")
+                   .attr("transform", "translate(" + (radius + 10) + ", " + (radius + 6) + ")")
+                   .attr('class', 'legendSvg');
+
+        legend.selectAll("path")
+              .data(pie)
+              .enter()
+              .append("path")
+              .attr("d", d3.svg.arc().innerRadius(0).outerRadius(16))
+              .attr({
+                    "fill": (function(_this) {
+                        return function(d, i) {
+                            if (i === 0) {
+                                return minColor;
+                            } else {
+                                return '#fdbf6f';
+                            }
+                        };
+                    })(this),
+                    "stroke": 'white',
+                    "stroke-width": '1.5px',
+                    "class": 'legslice'
+                });
+
         d3.select('.legslice').transition().duration(800).attr({
             "fill": (function(_this) {
                 return function(d, i) {
@@ -440,26 +464,47 @@ FreqMap = function() {
                 };
             })(this)
         });
-        $('#transLegend h3').html('<p>Sample sizes below 30 become increasingly transparent to represent uncertain frequencies, i.e.</p>').css('font-size', 12);
-        trans_legend = d3.select("#transLegend").selectAll("svg").data(trans_data).enter().append("svg").attr("width", radius + 50).attr("height", radius + 50).append("g").attr("transform", "translate(" + (radius + 10) + ", " + (radius + 20) + ")").attr('class', 'transSvg');
-        trans_legend.selectAll("path").data(pie).enter().append("path").attr("d", d3.svg.arc().innerRadius(0).outerRadius(16)).attr({
-            "fill": (function(_this) {
-                return function(d, i) {
-                    if (i === 0) {
-                        return '#1f78b4';
-                    } else {
-                        return '#fdbf6f';
-                    }
-                };
-            })(this),
-            "stroke": 'white',
-            "stroke-width": '1.5px',
-            "class": 'legslice',
-            "opacity": (function(_this) {
-                return function(d, i, index) {
-                    return opacityScale(index * 9);
-                };
-            })(this)
+        $('#transLegend h3').html(`
+            <p>
+                Sample sizes below 30 become increasingly transparent to represent uncertain frequencies, i.e.
+            </p>
+            `).css('font-size', 12);
+        trans_legend = d3.select("#transLegend")
+                         .selectAll("svg")
+                         .data(trans_data)
+                         .enter()
+                         .append("svg")
+                         .attr("width", radius + 50)
+                         .attr("height", radius + 50)
+                         .append("g")
+                         .attr("transform", "translate(" + (radius + 10) + ", " + (radius + 20) + ")")
+                         .attr('class', 'transSvg');
+
+        trans_legend.selectAll("path")
+                    .data(pie)
+                    .enter()
+                    .append("path")
+                    .attr("d", d3.svg.arc()
+                        .innerRadius(0)
+                    .outerRadius(16))
+                    .attr({
+                        "fill": (function(_this) {
+                            return function(d, i) {
+                                if (i === 0) {
+                                    return '#1f78b4';
+                                } else {
+                                    return '#fdbf6f';
+                                }
+                            };
+                        })(this),
+                        "stroke": 'white',
+                        "stroke-width": '1.5px',
+                        "class": 'legslice',
+                        "opacity": (function(_this) {
+                            return function(d, i, index) {
+                                return opacityScale(index * 9);
+                            };
+                    })(this)
         });
         trans_legend.append('text').text((function(_this) {
             return function(d, i, index) {
@@ -468,7 +513,6 @@ FreqMap = function() {
         })(this)).attr({
             'font-size': '11px'
         });
-        return $('#testLegend h3').html('<p>Please reference:</p><p>Marcus & Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="http://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"> <i id="linkIcon" class="fa fa-external-link"></i></a></p><p>Version: 0.4 (beta)</p><p>Funding provided by <a href="https://datascience.nih.gov/bd2k">NIH BD2K Program.</a></p>').css('font-size', 12);
     };
 
     arcTween = (function(_this) {
@@ -976,7 +1020,7 @@ $(function() {
         lines = paths[0][1];
         landmass = paths[0][2];
 
-        if ($('#dataset').chosen().val() === 'popres_euro') {
+        if (_datasets[get_current_dataset()].map_area === 'europe') {
             landmass = paths[0][3];
         }
 
@@ -1011,7 +1055,6 @@ $(function() {
             var nodeTotal = nodes.length; // - 5; // removes the bottom 5 nodes in the legend
 
             // ADD NODES TO MAP
-            var nodePath1, nodePath2, nodeLine, transform, translate, xtranslate, ytranslate, opacity, i;
             for (i = 0; i < nodeTotal; i++) {
                 nodeLine = $(nodes[i]).children()[0];
                 nodePath1 = $(nodes[i]).children()[1];
