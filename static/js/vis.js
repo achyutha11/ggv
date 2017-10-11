@@ -335,7 +335,11 @@ FreqMap = function() {
 
         var forceDrag = force.drag();
 
-        nodeG = node.enter().append("g").attr("class", "node").attr("id", function(d) {
+        nodeG = node.enter()
+                    .append("g")
+                    .attr("class", "node")
+                    .attr("class", "popnode")
+                    .attr("id", function(d) {
             return "node_" + d.id;
         }).attr({
             "transform": function(d) {
@@ -999,7 +1003,7 @@ $(function() {
 
         //doc = new PDFDocument({size:[612,450],margins:{top:0,bottom:0,left:0,right:0}});
         doc = new PDFDocument({
-            size: [480, 400],
+            size: [650, 500],
             margins: {
                 top: 0,
                 bottom: 0,
@@ -1042,7 +1046,7 @@ $(function() {
         }
 
         // position of map in pdf in translate(250,130)
-        doc.scale(.5).translate(160, 130).path($(sphere).attr('d')).stroke('black');
+        doc.scale(.5).translate(100, 130).path($(sphere).attr('d')).stroke('black');
         doc.path($(lines).attr('d')).strokeColor("#d2d2d2", 0.5).lineWidth(0.3).stroke();
         doc.path($(landmass).attr('d')).fillColor('#AAAAAA').fill();
 
@@ -1059,7 +1063,7 @@ $(function() {
                 allele1Color[i] = allele1Color[i].replace(/\D/g, '');
             }
             // position of header
-            doc.scale(2).fillColor('black').font('Arvo-Regular').text($(chromosome).text() + ' ', 100, -15, {
+            doc.scale(2).fillColor('black').font('Arvo-Regular').text($(chromosome).text() + ' ', 225, -15, {
                 continued: true
             }).fillColor(allele1Color).text($(allele1).text(), {
                 continued: true
@@ -1067,7 +1071,7 @@ $(function() {
                 continued: true
             }).fillColor('#fdbf6f').text($(allele2).text()).scale(.5);
 
-            var nodes = d3.selectAll('#svg_image g');
+            var nodes = d3.selectAll('#svg_image .popnode');
             nodes = nodes[0];
             var nodeTotal = nodes.length; // - 5; // removes the bottom 5 nodes in the legend
 
@@ -1111,14 +1115,14 @@ $(function() {
             $('span', freqLegend).remove();
 
             // position of legend
-            var legendheight = 210
-            doc.scale(2).fontSize(8).fillColor('black').font('Arvo-Italic').text(freqLegendi, -32, legendheight);
-            doc.fontSize(7).font('Arvo-Regular').text($.trim(freqLegend.text() + ' ' + freqLegendSpan.text()), -70, legendheight + 10, {
+            var legendheight = 350
+            doc.scale(2).fontSize(8).fillColor('black').font('Arvo-Italic').text(freqLegendi, 20, legendheight);
+            doc.fontSize(7).font('Arvo-Regular').text($.trim(freqLegend.text() + ' ' + freqLegendSpan.text()), 20, legendheight + 20, {
                 width: 215,
                 align: 'center'
             });
 
-            doc.translate(30, legendheight + 40).scale(0.5).path("M0,-16A16,16 0 0,1 16,0L0,0Z").fillColor(fLSColor).strokeColor('white').fillAndStroke();
+            doc.translate(137, legendheight + 50).scale(0.5).path("M0,-16A16,16 0 0,1 16,0L0,0Z").fillColor(fLSColor).strokeColor('white').fillAndStroke();
             doc.path("M16,0A16,16 0 1,1 -2.9391523179536475e-15,-16L0,0Z").fillColor('#fdbf6f').strokeColor('white').fillAndStroke().scale(2).translate(-103, -legendheight - 40);
 
             // TRANS LEGEND
@@ -1154,7 +1158,7 @@ $(function() {
     // when 'Convert to PDF' is triggered, use the current PDF and fill in the
     // rest of the details (nodes, text, etc.)
     $('#pdf').on('click', function() {
-        alert("A PDF is being generated but may take a few seconds. Please close this box to procede");
+        alert("A PDF is being generated but may take a few seconds. Please close this box to proceed");
         newPDF();
     });
 
