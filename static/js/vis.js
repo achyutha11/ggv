@@ -215,7 +215,7 @@ FreqMap = function() {
     };
 
     // updates the data shown on the page
-    freqMap.update_data = function(url) {
+    freqMap.update_data = function(url, update_igv = true) {
         return d3.json(url, function(error, data) {
             if (error) {
                 currentDataset = get_current_dataset();
@@ -234,7 +234,9 @@ FreqMap = function() {
                 // Set search with variant
                 $("#search").val(search_variant);
                 console.log(search_variant);
-                igv.browser.search(search_variant);
+                if (update_igv) {
+                    igv.browser.search(search_variant);
+                }
 
                 return update();
             }
@@ -644,13 +646,15 @@ activate("layouts", 'true');
 
 setup_igv = function(init_loc) {
 
+    build = _datasets[get_current_dataset()]
+
     // options for browser
     var options = {
 
         locus: init_loc,
 
         reference: {
-            id: "hg19",
+            id: build,
         },
 
         trackDefaults: {
@@ -693,8 +697,9 @@ setup_igv = function(init_loc) {
         console.log(popoverData);
         chrom = $(".igvNavigationSearchInput").val().split(":")[0];
         // Fill Search bar
-        $("#search").val(chrom + ":" + pos);
-        search();
+        query = chrom + ":" + pos;
+        $("#search").val(query);
+        search(query, update_igv = false);
         return false;
     });
 
@@ -739,11 +744,11 @@ $('#dataset').change(function() {
 
 window.plot = plot;
 
-search = function(query) {
+search = function(query, update_igv = true) {
         if (query === undefined) {
             query = $('#search').val()
         }
-        plot.update_data(get_query_url(query));
+        plot.update_data(get_query_url(query), update_igv = update_igv);
 }
 
 // Bind search
@@ -776,6 +781,16 @@ $('#submitArea').click(function() {
 construct_trackset = function() {
     ds = _datasets[get_current_dataset()]
 
+    trackset = [];
+
+    // Additional tracks
+    tracklist = _datasets[get_current_dataset()].tracks;
+    for (var key in tracklist) {
+        track = tracklist[key];
+        track['name'] = key;
+        trackset.push(track)
+    }
+
     variant_bed = {
         name: ds.label,
         url: base_url + '/track' + ds.bed,
@@ -785,7 +800,9 @@ construct_trackset = function() {
         format: 'bed'
     }
 
-    return [variant_bed]
+    trackset.push(variant_bed);
+
+    return trackset
 }
 
 
