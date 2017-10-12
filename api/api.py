@@ -71,8 +71,20 @@ def _random_line(file_name):
     """
         Reads a random line from a gzip file.
     """
-    total_bytes = os.stat(file_name).st_size
+    # Get filesize
+    try:
+        with open(file_name + '.bytes', 'r') as f:
+            total_bytes = int(f.read())
+        if not total_bytes:
+            raise ValueError("total bytes must be greater than 0")
+    except (IOError, ValueError):
+        comm = "zcat {} | wc -c".format(file_name)
+        app.logger.info(comm)
+        total_bytes = int(Popen(comm, shell=True, stdout=PIPE).communicate()[0])
+        with open(file_name + '.bytes', 'w') as f:
+            f.write(str(total_bytes))
     random_point = random.randint(0, total_bytes)
+    app.logger.info(random_point)
     file = gzip.open(file_name)
     file.seek(random_point)
     file.readline()  # skip this line to clear the partial line
