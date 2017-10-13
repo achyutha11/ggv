@@ -73,8 +73,8 @@ h2{
 
 #vis {
     /* 940w/ 500h */
-  width: 640px;
-  height: 455px;
+  width: 1170;
+  min-height: 600px;
   clear: both;
 
   display: block;

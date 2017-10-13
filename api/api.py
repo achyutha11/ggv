@@ -130,7 +130,7 @@ def fetch_variant(dataset, query):
     check_rs = False # Used to verify rs identifiers.
     verify_rs = False
     rs_looked_up = False
-    rs_info = None
+    rs_info = {}
 
     if query == 'random':
         # Use bedfile when fetching random
