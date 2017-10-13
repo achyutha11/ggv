@@ -45,10 +45,15 @@ base_path = HERE + YAML_CONFIG['base_path']
 @app.route('/')
 @app.route('/<string:dataset>/<string:loc>')
 def root(dataset = "", loc = ""):
-
     base_url = YAML_CONFIG['base_url']
+    datasets = {}
+    for k, v in YAML_CONFIG['datasets'].items():
+        try:
+            if v['api_only'] is True:
+                continue
+        except:
+            datasets[k] = v
 
-    datasets = YAML_CONFIG['datasets']
     if not loc:
         dataset = datasets.keys()[0]
         return redirect(url_for('root', dataset=dataset, loc = 'random'))
