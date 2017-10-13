@@ -337,8 +337,7 @@ FreqMap = function() {
 
         nodeG = node.enter()
                     .append("g")
-                    .attr("class", "node")
-                    .attr("class", "popnode")
+                    .attr("class", "node popnode")
                     .attr("id", function(d) {
             return "node_" + d.id;
         }).attr({
