@@ -744,6 +744,7 @@ $('#dataset').change(function() {
     map_area = _datasets[get_current_dataset()].map_area
     draw_map(map_area);
     plot.update_data(get_query_url("random"));
+    setup_igv($("#search").val());
 });
 
 window.plot = plot;
