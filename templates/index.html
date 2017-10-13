@@ -20,90 +20,93 @@
 </head>
 <body>
     <div class="container" id='all'>
-        <div id="main" role="main">
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-            <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
-            <h1>Geography of Genetic Variants Browser</h1>
-            <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About / Help</a></p>
-            <div class='row'>
-                <div class='col-md-12'>
-                    <div class='alert alert-danger' id='msg-alert' role='alert'>
-                        <i class='fa fa-exclamation-triangle' aria-hidden='true'></i>
-                        <span class='sr-only'>Error:</span>
-                        <span id='msg-alert-error'></span>
+        <div id="main" class = 'row' role="main">
+            <div class='col-md-12'>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+                <h1>Geography of Genetic Variants Browser</h1>
+                <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About / Help</a></p>
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class='alert alert-danger' id='msg-alert' role='alert'>
+                            <i class='fa fa-exclamation-triangle' aria-hidden='true'></i>
+                            <span class='sr-only'>Error:</span>
+                            <span id='msg-alert-error'></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">About</h4>
+                            </div>
+                            <div class="modal-body">
+                                Welcome to the Geography of Genetic Variants (GGV)
+                                browser! <br><br> To begin, pick a dataset on the
+                                dropdown menu. One can search variants within a dataset
+                                by its rsID or position (Use the format
+                                chromosome#:position, as in, 15:24608502 or
+                                chr15:24608502) and clicking the search button or the
+                                enter key.  Click the "random" button to show a random
+                                marker from the chosen dataset.<br><br>
+                                The embedded
+                                IGV browser at the bottom of the page can also also be
+                                used to pick a variant for display.  <br> <br>
+                                To
+                                display the population name, minor allele frequency,
+                                minor allele count, and sample size, hover with the
+                                mouse over a data point. Click on the plot title to open
+                                up the UCSC genome browser at that variant.
+                                <br><br>Be sure to note we use a notion of a "frequency scale" to display rare variants and a "transparency scale" to indicate uncertain allele frequencies.  These are explained in the legend.
+                                <br><br>
+                                If you use the maps in other works, include the source link: <a href="https://www.popgen.uchicago.edu/ggv/">https://www.popgen.uchicago.edu/ggv</a>
+                                and/or make a formal reference to:<br>
+                                Marcus &amp; Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="https://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"><i id='linkIcon' class='fa fa-external-link'></i>.</a>
+                                <br><br>Keep in mind that this
+                                is still an evolving project and many ideas/resources are in progress.
+                                <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com or jnovembre at uchicago dot edu.
+                                <br><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="browser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">IGV Genome Browser Help</h4>
+                            </div>
+                            <div class="modal-body">
+                                To use the embedded IGV Browser, input the number of the chromosome you would like to look at in the search box and hit enter. You can zoom in/out on the chromosome by clicking on the +/- buttons on the right side of the browser. You can zoom in on a specific section of the chromosome by clicking and dragging along the axis.
+                                <br><br>
+                                To move about the chromosome, you can use the arrow keys to move left or right. You can also click and drag on the genes and variants sections if you would like to make smaller movements. To jump to another section of the chromosome, you can click on areas you would like to look at on the upper chromosome display, and the red window will move there.
+                                <br><br>
+                                If you click on a variant (vertical grey bar) in the variants section, then that variant will be displayed on the map above. Also, if you search for a variant in the upper search box by the map, the browser will switch to the variant's chromosome and zoom into that variant's location along the chromosome.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-list-ol"></i></h4>
+                            </div>
+                            <div class="modal-body">
+                                <form id='snpArea'>
+                                    copy paste a single column of snps <i class="fa fa-long-arrow-down"></i>. Remeber to select the appropriate dataset!
+                                    <textarea id='snp_col' class="form-control" rows="3" type="text"></textarea>
+                                    <button id='submitArea' type="button" class="btn btn-default">submit</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel">About</h4>
-                        </div>
-                        <div class="modal-body">
-                            Welcome to the Geography of Genetic Variants (GGV)
-                            browser! <br><br> To begin, pick a dataset on the
-                            dropdown menu. One can search variants within a dataset
-                            by its rsID or position (Use the format
-                            chromosome#:position, as in, 15:24608502 or
-                            chr15:24608502) and clicking the search button or the
-                            enter key.  Click the "random" button to show a random
-                            marker from the chosen dataset.<br><br>
-                            The embedded
-                            IGV browser at the bottom of the page can also also be
-                            used to pick a variant for display.  <br> <br>
-                            To
-                            display the population name, minor allele frequency,
-                            minor allele count, and sample size, hover with the
-                            mouse over a data point. Click on the plot title to open
-                            up the UCSC genome browser at that variant.
-                            <br><br>Be sure to note we use a notion of a "frequency scale" to display rare variants and a "transparency scale" to indicate uncertain allele frequencies.  These are explained in the legend.
-                            <br><br>
-                            If you use the maps in other works, include the source link: <a href=https://www.popgen.uchicago.edu/ggv/>https://www.popgen.uchicago.edu/ggv</a>
-                            and/or make a formal reference to:<br>
-                            Marcus & Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="https://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"><i id='linkIcon' class='fa fa-external-link'></i>.</a>
-                            <br><br>Keep in mind that this
-                            is still an evolving project and many ideas/resources are in progress.
-                            <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com or jnovembre at uchicago dot edu.
-                            <br><br>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="browser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel">IGV Genome Browser Help</h4>
-                        </div>
-                        <div class="modal-body">
-                            To use the embedded IGV Browser, input the number of the chromosome you would like to look at in the search box and hit enter. You can zoom in/out on the chromosome by clicking on the +/- buttons on the right side of the browser. You can zoom in on a specific section of the chromosome by clicking and dragging along the axis.
-                            <br><br>
-                            To move about the chromosome, you can use the arrow keys to move left or right. You can also click and drag on the genes and variants sections if you would like to make smaller movements. To jump to another section of the chromosome, you can click on areas you would like to look at on the upper chromosome display, and the red window will move there.
-                            <br><br>
-                            If you click on a variant (vertical grey bar) in the variants section, then that variant will be displayed on the map above. Also, if you search for a variant in the upper search box by the map, the browser will switch to the variant's chromosome and zoom into that variant's location along the chromosome.
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-list-ol"></i></h4>
-                        </div>
-                        <div class="modal-body">
-                            <form id='snpArea'>
-                                copy paste a single column of snps <i class="fa fa-long-arrow-down"></i>. Remeber to select the appropriate dataset!
-                                <textarea id='snp_col' class="form-control" rows="3" type="text"></textarea>
-                                <button id='submitArea' type="button" class="btn btn-default">submit</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class='row' id='settings'>
                 <div class='col-sm-4'>
@@ -116,7 +119,7 @@
                 </div>
                 <div class='col-sm-5'>
                     <div id='variant_settings'>
-                        <div>
+                        <div class='text-center'>
                             <form id='buttons' class='btn-group' onSubmit="return false;">
                                 <input id='search' type="text" class="form-control" placeholder='rsID/chr#:pos'>
                                 <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
@@ -129,10 +132,12 @@
                 </div>
                 
                 <div id="layouts" class='col-sm-3'>
-                    Avoid overlap:
-                    <div class='btn-group'>
-                        <a id="true" class="btn btn-default">Off</a>
-                        <a id="charged" class="btn btn-default">On</a>
+                    <div style='text-align: right'>
+                        Avoid overlap:
+                        <div class='btn-group'>
+                            <a id="true" class="btn btn-default">Off</a>
+                            <a id="charged" class="btn btn-default">On</a>
+                        </div>
                     </div>
                 </div>
                 <div class='col-sm-6' id='slider-holder'>
@@ -140,6 +145,7 @@
                 </div>
                 
             </div>
+        </div>
             
             <div class="modal fade" id="alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog">

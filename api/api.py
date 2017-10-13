@@ -10,7 +10,6 @@ from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
 from Bio import bgzf
 
-
 #
 # Error handling
 #
