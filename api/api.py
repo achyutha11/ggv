@@ -8,6 +8,7 @@ from ggv.app import app, datasets, base_path, HERE, YAML_CONFIG
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
+from Bio import bgzf
 
 
 #
@@ -37,6 +38,10 @@ def handle_invalid_usage(error):
 
 def _resolve_dataset_tabix(dataset):
     return base_path + datasets[dataset]['tabix']
+
+
+def _resolve_dataset_bed(dataset):
+    return base_path + datasets[dataset]['bed']
 
 
 def _resolve_rsid(rsID):
@@ -72,23 +77,10 @@ def _random_line(file_name):
         Reads a random line from a gzip file.
     """
     # Get filesize
-    try:
-        with open(file_name + '.bytes', 'r') as f:
-            total_bytes = int(f.read())
-        if not total_bytes:
-            raise ValueError("total bytes must be greater than 0")
-    except (IOError, ValueError):
-        comm = "zcat {} | wc -c".format(file_name)
-        app.logger.info(comm)
-        total_bytes = int(Popen(comm, shell=True, stdout=PIPE).communicate()[0])
-        with open(file_name + '.bytes', 'w') as f:
-            f.write(str(total_bytes))
-    random_point = random.randint(0, total_bytes)
-    app.logger.info(random_point)
-    file = gzip.open(file_name)
-    file.seek(random_point)
-    file.readline()  # skip this line to clear the partial line
-    return file.readline()
+    grabix_command = ['grabix', 'random', file_name, '1']
+    app.logger.info(' '.join(map(str,grabix_command)))
+    line = Popen(grabix_command, stdout=PIPE).communicate()[0]
+    return line
 
 
 def _define_freqscale(freq):
@@ -134,13 +126,15 @@ def fetch_variant(dataset, query):
 
     query = query.replace("chr", "")
     full_path = _resolve_dataset_tabix(dataset)
+    full_path_bed = _resolve_dataset_bed(dataset)
     check_rs = False # Used to verify rs identifiers.
     verify_rs = False
     rs_looked_up = False
     rs_info = None
 
     if query == 'random':
-        line = _random_line(full_path)
+        # Use bedfile when fetching random
+        line = _random_line(full_path_bed)
         chrom, pos = line.split("\t")[0:2]
         region = "{}:{}-{}".format(chrom, pos, int(pos) + 1)
     elif query.startswith("rs"):
