@@ -79,7 +79,8 @@ def _random_line(file_name):
     # Get filesize
     grabix_command = ['grabix', 'random', file_name, '1']
     app.logger.info(' '.join(map(str,grabix_command)))
-    line = Popen(grabix_command, stdout=PIPE).communicate()[0]
+    line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
+    app.logger.info(err)
     return line
 
 
