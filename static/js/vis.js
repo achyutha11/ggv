@@ -33,9 +33,9 @@ FreqMap = function() {
     radiusScale = d3.scale.linear().domain([0, 1]).range([5, radius * 1.5]);
     opacityScale = d3.scale.sqrt().domain([1, 30]).range([.3, 1]);
     charge = function(node) {
-        return -Math.pow(node.radius, 2.0) / 8;
+        return 0;
     };
-    force = d3.layout.force().size([width, height]).gravity(0).friction(0.01);
+    force = d3.layout.force().size([width, height]).gravity(0).friction(0.15);
     
     pies = null;
     pie = d3.layout.pie().startAngle(5 * Math.PI / 2).endAngle(Math.PI / 2).sort(null);
@@ -608,7 +608,7 @@ FreqMap = function() {
     };
     collide = function(node) {
         var nx1, nx2, ny1, ny2, r;
-        r = node.radius + 16;
+        r = 16;
         nx1 = node.x - r;
         nx2 = node.x + r;
         ny1 = node.y - r;
@@ -619,9 +619,9 @@ FreqMap = function() {
                 x = node.x - quad.point.x;
                 y = node.y - quad.point.y;
                 l = Math.sqrt(x * x + y * y);
-                r = node.radius + quad.point.radius + 8;
+                r = 40;
                 if (l < r) {
-                    l = (l - r) / l * .5;
+                    l = (l - r) / l * .1;
                     node.x -= x *= l;
                     node.y -= y *= l;
                     quad.point.x += x;
@@ -697,7 +697,6 @@ setup_igv = function(init_loc) {
     // Handle clicking on variants
     browser.on('trackclick', function (track, popoverData, pos) {
         // Get chromosome
-        console.log(popoverData);
         chrom = $(".igvNavigationSearchInput").val().split(":")[0];
         // Fill Search bar
         query = chrom + ":" + pos;
@@ -715,7 +714,6 @@ setup_igv = function(init_loc) {
  */
 
 d3.json(get_query_url(init_loc), function(data) {
-    console.log(data);
     plot('#vis', data);
     setup_igv(data['variant']['chrom'] + ':' + data['variant']['pos'])
 });
