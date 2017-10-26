@@ -10,6 +10,8 @@ from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
 from Bio import bgzf
 from ggv.authentication import login_required
+from flask import session, g
+from datetime import datetime
 
 #
 # Error handling
@@ -130,6 +132,17 @@ def tabix_region(path, region):
 @login_required
 def fetch_variant(dataset, query):
 
+    # Log request
+    with open(HERE + "/access.log", 'a') as f:
+        logline = [session['username'], 
+                   session['service'],
+                   'fetch_variant',
+                   dataset,
+                   query,
+                   datetime.now().isoformat()]
+        print(logline)
+        f.write('\t'.join(logline) + "\n")
+
     query = query.replace("chr", "")
     full_path = _resolve_dataset_tabix(dataset)
     full_path_bed = _resolve_dataset_bed(dataset)
@@ -237,6 +250,18 @@ def api_tabix_request(dataset, region):
         Optionally use 'dl' at end 
         to download tsv.
     """
+
+    # Log request
+    with open(HERE + "/access.log", 'a') as f:
+        logline = [session['username'], 
+                   session['service'],
+                   'tabix_request',
+                   dataset,
+                   query,
+                   datetime.now().isoformat()]
+        print(logline)
+        f.write('\t'.join(logline) + "\n")
+
     if region.startswith("rs"):
         rs_info = _resolve_rsid(region)
         region = rs_info['location']

@@ -51,11 +51,13 @@ handler.setLevel(logging.INFO)
 app.logger.addHandler(handler)
 from ggv.authentication import login_required
 
+
+
 @app.route('/')
 @app.route('/<string:dataset>/<string:loc>')
 @login_required
 def index(dataset = "", loc = ""):
-    username = session['twitter_oauth']['screen_name']
+    username = session['username']
 
     base_url = YAML_CONFIG['base_url']
     datasets = {}
