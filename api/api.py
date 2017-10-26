@@ -4,11 +4,12 @@ import random
 import gzip
 import requests
 import math
-from ggv.app import app, datasets, base_path, HERE, YAML_CONFIG
+from ggv.main import app, datasets, base_path, HERE, YAML_CONFIG, session
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
 from flask import jsonify, Response, request
 from Bio import bgzf
+from ggv.authentication import login_required
 
 #
 # Error handling
@@ -126,6 +127,7 @@ def tabix_region(path, region):
 
 
 @app.route("/api/variant/<string:dataset>/<string:query>", methods=['GET'])
+@login_required
 def fetch_variant(dataset, query):
 
     query = query.replace("chr", "")
@@ -228,6 +230,7 @@ def fetch_variant(dataset, query):
 
 @app.route("/api/tabix/<string:dataset>/<string:region>", methods=['GET'])
 @app.route("/api/tabix/<string:dataset>/<string:region>/dl", methods=['GET'])
+@login_required
 def api_tabix_request(dataset, region):
     """
         Outputs raw tabix data; 

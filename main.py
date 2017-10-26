@@ -5,46 +5,58 @@ import os
 import re
 import json
 import logging
-import mimetypes
+
 from flask import (Flask,
                    send_from_directory,
                    Response,
                    request,
                    render_template,
-                   redirect, url_for,
-                   send_file)
+                   redirect,
+                   url_for,
+                   send_file,
+                   session,
+                   g)
 from logging.handlers import RotatingFileHandler
 from flask_compress import Compress
 from flask_cors import CORS, cross_origin
+from flask import Flask
 
 app = Flask(__name__)
 
+
 # Setup App
-Compress(app)
-CORS(app)
+#Compress(app)
+#CORS(app)
 
-app.debug = True
-#handler = RotatingFileHandler('/var/www/dev-integrated/ggv.log', maxBytes=10000, backupCount=1)
-#handler.setLevel(logging.INFO)
-#app.logger.addHandler(handler)
-app.config["APPLICATION_ROOT"] = "/dev-integrated"
-
-app.config['STATIC_FOLDER'] = 'static'
-
-# Load configuration
+#app.config["APPLICATION_ROOT"] = "/dev-integrated"
+#
+#app.config['STATIC_FOLDER'] = 'static'
+#
+## Load configuration
 app.config['HERE'] = os.path.dirname(os.path.realpath(__file__))
 config_yaml = os.path.join(app.config['HERE'], "config.yaml")
 app.config['YAML_CONFIG'] = yaml.load(open(config_yaml, 'r').read())
+app.secret_key = app.config['YAML_CONFIG']['flask_secret_key']
 
-# Define vars
+#
+## Define vars
 HERE = app.config['HERE']
 YAML_CONFIG = app.config['YAML_CONFIG']
 datasets = YAML_CONFIG['datasets']
 base_path = HERE + YAML_CONFIG['base_path']
 
+# Setup Logging
+handler = RotatingFileHandler(HERE + 'ggv.log', maxBytes=10000, backupCount=1)
+handler.setLevel(logging.INFO)
+app.logger.addHandler(handler)
+from ggv.authentication import login_required
+
 @app.route('/')
 @app.route('/<string:dataset>/<string:loc>')
-def root(dataset = "", loc = ""):
+@login_required
+def index(dataset = "", loc = ""):
+    username = session['twitter_oauth']['screen_name']
+
     base_url = YAML_CONFIG['base_url']
     datasets = {}
     for k, v in YAML_CONFIG['datasets'].items():
@@ -56,8 +68,13 @@ def root(dataset = "", loc = ""):
 
     if not loc:
         dataset = datasets.keys()[0]
-        return redirect(url_for('root', dataset=dataset, loc = 'random'))
+        return redirect(url_for('index', dataset=dataset, loc = 'random'))
     return render_template('index.html', **locals())
+
+
+@app.route("/welcome")
+def welcome_login_page():
+    return render_template('login.html', **locals())
 
 
 @app.after_request
@@ -96,6 +113,7 @@ def send_track(path):
     rv.headers['Content-Range'] = 'bytes {0}-{1}/{2}'.format(offset, offset + length-1, size)
     return rv
 
+
 @app.route('/reference/<path:path>')
 def send_reference(path):
     path = os.path.join(os.path.dirname(__file__), 'reference', path)
@@ -104,16 +122,17 @@ def send_reference(path):
 
 # Dev of new API
 from api import *
+from authentication import *
 
 if __name__ == '__main__':
-    app.debug = True
-    formatter = logging.Formatter(
-        "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
-    handler = RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
-    handler.setLevel(logging.DEBUG)
-    handler.setFormatter(formatter)
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.DEBUG)
-    log.addHandler(handler)
-    app.logger.addHandler(handler)
+    #app.debug = True
+    #formatter = logging.Formatter(
+    #    "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
+    #handler = RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
+    #handler.setLevel(logging.DEBUG)
+    #handler.setFormatter(formatter)
+    #log = logging.getLogger('werkzeug')
+    #log.setLevel(logging.DEBUG)
+    #log.addHandler(handler)
+    #app.logger.addHandler(handler)
     app.run()
