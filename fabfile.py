@@ -14,4 +14,5 @@ def deploy():
     code_dir = '/var/www/dev-integrated/ggv'
     with cd(code_dir):
         sudo("git pull")
+        sudo("pip install -r requirements.txt")
         sudo("apachectl restart")

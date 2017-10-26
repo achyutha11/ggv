@@ -7,6 +7,6 @@ sys.path.insert(0, dirname(base_path))
 
 logging.basicConfig(filename=base_path + "/ggv.log", level=logging.INFO)
 
-from ggv.app import app as application
+from ggv.main import app as application
 from werkzeug.debug import DebuggedApplication 
 application = DebuggedApplication(application, True)
