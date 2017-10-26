@@ -123,14 +123,4 @@ from api import *
 from authentication import *
 
 if __name__ == '__main__':
-    #app.debug = True
-    #formatter = logging.Formatter(
-    #    "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
-    #handler = RotatingFileHandler('ggv.log', maxBytes=10000000, backupCount=3)
-    #handler.setLevel(logging.DEBUG)
-    #handler.setFormatter(formatter)
-    #log = logging.getLogger('werkzeug')
-    #log.setLevel(logging.DEBUG)
-    #log.addHandler(handler)
-    #app.logger.addHandler(handler)
     app.run()
