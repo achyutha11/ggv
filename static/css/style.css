@@ -1,5 +1,6 @@
 body {
   font-family: 'Arvo', Georgia, Times, serif;
+  padding-top: 25px;
 }
 
 h1, #about, h2, h3, p {
