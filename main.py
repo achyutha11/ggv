@@ -45,10 +45,6 @@ YAML_CONFIG = app.config['YAML_CONFIG']
 datasets = YAML_CONFIG['datasets']
 base_path = HERE + YAML_CONFIG['base_path']
 
-# Setup Logging
-handler = RotatingFileHandler(HERE + 'ggv.log', maxBytes=10000, backupCount=1)
-handler.setLevel(logging.INFO)
-app.logger.addHandler(handler)
 from ggv.authentication import login_required
 
 
