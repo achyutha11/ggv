@@ -105,9 +105,11 @@ def _define_freqscale(freq):
 
     freq_scale = {-4: [0.0001, 10000],
                   -3: [0.001, 1000],
-                  -2: [0.01, 1000],
+                  -2: [0.01, 100],
                   -1: [0.1, 10],
                   0: [1, 1]}
+    print(pw)
+    print(freq_scale[pw])
     return freq_scale[pw]
 
     #for i in range(0,len(json_data)):
@@ -140,7 +142,6 @@ def fetch_variant(dataset, query):
                    dataset,
                    query,
                    datetime.now().isoformat()]
-        print(logline)
         f.write('\t'.join(logline) + "\n")
 
     query = query.replace("chr", "")
@@ -225,6 +226,7 @@ def fetch_variant(dataset, query):
     freq_scale, freq_multi = _define_freqscale(max_freq)
     for row in variant_response:
         row['freqscale'] = freq_scale
+
         row['freq'] = [row['rawfreq'] * freq_multi,
                        1.0 - (row['rawfreq'] * freq_multi)]
 
