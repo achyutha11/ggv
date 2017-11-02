@@ -107,9 +107,11 @@ def login_required(func):
         access_key = request.args.get('access_key', '')
         if access_key == access_confirm and access_key:
             session['username'] = 'access_key'
+            session['service'] = 'API'
             return func(*args, **kwargs) # Explicit return here
         elif access_key != access_confirm:
             session.pop('username', None)
+            session.pop('service', None)
             return redirect(url_for('welcome_login_page'))
         elif 'username' not in session:
             return redirect(url_for('welcome_login_page'))
