@@ -108,8 +108,6 @@ def _define_freqscale(freq):
                   -2: [0.01, 100],
                   -1: [0.1, 10],
                   0: [1, 1]}
-    print(pw)
-    print(freq_scale[pw])
     return freq_scale[pw]
 
     #for i in range(0,len(json_data)):
@@ -261,7 +259,6 @@ def api_tabix_request(dataset, region):
                    dataset,
                    query,
                    datetime.now().isoformat()]
-        print(logline)
         f.write('\t'.join(logline) + "\n")
 
     if region.startswith("rs"):

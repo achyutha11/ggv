@@ -103,7 +103,17 @@ def login_required(func):
     
     @wraps(func)
     def inner(*args, **kwargs):
-        if 'username' not in session:
+        access_confirm = app.config['YAML_CONFIG']['access_key']
+        access_key = request.args.get('access_key', '')
+        if access_key == access_confirm and access_key:
+            session['username'] = 'access_key'
+            return func(*args, **kwargs) # Explicit return here
+        elif access_key != access_confirm:
+            session.pop('username', None)
             return redirect(url_for('welcome_login_page'))
+        elif 'username' not in session:
+            return redirect(url_for('welcome_login_page'))
+        elif session['username'] == "access_key":
+            session.pop('username', None)
         return func(*args, **kwargs)
     return inner
