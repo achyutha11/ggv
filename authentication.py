@@ -5,7 +5,7 @@ from flask import g, request, url_for, flash
 from flask import redirect, url_for, render_template
 from flask import jsonify
 from flask_oauthlib.client import OAuth
-
+from urlparse import urlparse
 
 from ggv.main import app, session
 
@@ -100,12 +100,17 @@ def login_required(func):
     """
     decorator that checks oauth token present in session.
     """
-    
     @wraps(func)
     def inner(*args, **kwargs):
         access_confirm = app.config['YAML_CONFIG']['access_key']
         access_key = request.args.get('access_key', '')
-        if access_key == access_confirm and access_key:
+        ref = urlparse(request.referrer)
+        print(ref)
+        if ref.netloc.endswith("clinicalgenome.org"):
+            session['username'] = 'clinical_genome'
+            session['service'] = 'API'
+            return func(*args, **kwargs) # Explicit return here
+        elif access_key == access_confirm and access_key:
             session['username'] = 'access_key'
             session['service'] = 'API'
             return func(*args, **kwargs) # Explicit return here
