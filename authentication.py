@@ -104,13 +104,14 @@ def login_required(func):
     def inner(*args, **kwargs):
         access_confirm = app.config['YAML_CONFIG']['access_key']
         access_key = request.args.get('access_key', '')
-        ref = urlparse(request.referrer)
-        print(ref)
-        if ref.netloc.endswith("clinicalgenome.org"):
-            session['username'] = 'clinical_genome'
-            session['service'] = 'API'
-            return func(*args, **kwargs) # Explicit return here
-        elif access_key == access_confirm and access_key:
+        ref = ""
+        if request.referrer:
+            ref = urlparse(request.referrer)
+            if ref.netloc.endswith("clinicalgenome.org"):
+                session['username'] = 'clinical_genome'
+                session['service'] = 'API'
+                return func(*args, **kwargs) # Explicit return here
+        if access_key == access_confirm and access_key:
             session['username'] = 'access_key'
             session['service'] = 'API'
             return func(*args, **kwargs) # Explicit return here
