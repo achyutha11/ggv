@@ -110,16 +110,16 @@ def _define_freqscale(freq):
                   0: [1, 1]}
     return freq_scale[pw]
 
-    #for i in range(0,len(json_data)):
-    #    json_data[i]['freq']=[json_data[i]['rawfreq']*freq_mult,1-json_data[i]['rawfreq']*freq_mult]
-    #    json_data[i]['freqscale']=freqscale
-
 
 def tabix_region(path, region):
     chrom, start_end = region.split(":")
-    start, end = map(int, start_end.split("-"))
-    end = end
+    if '-' in start_end:
+        start, end = map(int, start_end.split("-"))
+    else:
+        start = start_end
+        end = start_end
     region = "{chrom}:{start}-{end}".format(**locals())
+    app.logger.info(region)
     tabix = YAML_CONFIG['tabix_path']
     tabix_command = [tabix, path, region]
     app.logger.info(' '.join(tabix_command))
@@ -190,6 +190,7 @@ def fetch_variant(dataset, query):
         response = {}
         line = line.strip().split()
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:11]
+        app.logger.info(freq)
 
         if verify_rs:
             if query != rsID:
@@ -212,9 +213,15 @@ def fetch_variant(dataset, query):
 
         response['chrom_pos'] = '{}:{}'.format(chrom, pos)
         response['alleles'] = [ref, alt]
+        response['count_ref'] = (n_obs - x_obs)
+        response['count_alt'] = (x_obs)
+        response['count_total'] = n_obs
+        response['freq_ref'] = float(response['count_ref']) / response['count_total']
+        response['freq_alt'] = float(response['count_alt']) / response['count_total']
+        response['count_total'] = n_obs
         response['xobs'] = x_obs
         response['nobs'] = n_obs
-        response['rawfreq'] = freq
+        response['rawfreq'] = float(freq)
         response['pop'] = pop
         response['pos'] = coords[pop]
         response['rsID'] = rsID
@@ -257,7 +264,7 @@ def api_tabix_request(dataset, region):
                    session['service'],
                    'tabix_request',
                    dataset,
-                   query,
+                   region,
                    datetime.now().isoformat()]
         f.write('\t'.join(logline) + "\n")
 
