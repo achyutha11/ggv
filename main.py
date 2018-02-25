@@ -53,8 +53,10 @@ from ggv.authentication import login_required
 @app.route('/<string:dataset>/<string:loc>')
 @login_required
 def index(dataset = "", loc = ""):
-    username = session['username']
-
+    try:
+        username = session['username']
+    except KeyError:
+        loc = None
     base_url = YAML_CONFIG['base_url']
     datasets = {}
     for k, v in YAML_CONFIG['datasets'].items():

@@ -118,7 +118,7 @@ def _define_freqscale(freq):
 def tabix_region(path, region):
     chrom, start_end = region.split(":")
     start, end = map(int, start_end.split("-"))
-    end = end + 1
+    end = end
     region = "{chrom}:{start}-{end}".format(**locals())
     tabix = YAML_CONFIG['tabix_path']
     tabix_command = [tabix, path, region]
