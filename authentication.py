@@ -107,7 +107,7 @@ def login_required(func):
         ref = ""
         if request.referrer:
             ref = urlparse(request.referrer)
-            if ref.netloc.endswith("clinicalgenome.org"):
+            if ref.netloc.endswith("clinicalgenome.org") or ref.netloc.endswith("pharmgkb.org"):
                 session['username'] = 'clinical_genome'
                 session['service'] = 'API'
                 return func(*args, **kwargs) # Explicit return here
