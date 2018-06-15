@@ -9,7 +9,6 @@ env.use_ssh_config = True
 def prepare_deploy():
     local("git push")
 
-
 def deploy():
     code_dir = '/var/www/dev-integrated/ggv'
     with cd(code_dir):
