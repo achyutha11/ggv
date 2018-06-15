@@ -216,8 +216,8 @@ def fetch_variant(dataset, query):
         response['count_ref'] = (n_obs - x_obs)
         response['count_alt'] = (x_obs)
         response['count_total'] = n_obs
-        response['freq_ref'] = float(response['count_ref']) / response['count_total']
-        response['freq_alt'] = float(response['count_alt']) / response['count_total']
+        response['freq_ref'] = float(response['count_ref']) / response['count_total'] if response['count_total'] else 0
+        response['freq_alt'] = float(response['count_alt']) / response['count_total'] if response['count_total'] else 0
         response['count_total'] = n_obs
         response['xobs'] = x_obs
         response['nobs'] = n_obs

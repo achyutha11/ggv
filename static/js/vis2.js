@@ -87,7 +87,25 @@ draw_map = function(map_area = 'world') {
 
                 })
 
-    } 
+    } else if (map_area == 'china') {
+        console.log(map_area);
+        projection.scale(1000)
+              .rotate([-15, 0, 0])
+              .translate([width / 2 - 10, height / 2 + 850]);
+
+                vis.selectAll('.map-path').attr('d', path);
+                console.log(vis.selectAll('.countries')[0]);
+
+                d3.json('/static/data/world-50m.json', function(error, world) {
+                    countries = topojson.feature(world, world.objects.countries);
+                    vis.selectAll('.countries').attr('d', '');
+                    vis.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
+                        'd': path,
+                        'fill': '#aaa'
+                    });
+
+                })
+    }
    
 
 
@@ -241,6 +259,9 @@ FreqMap = function() {
             return currentDataset = dataset;
         } else if (dataset == 'POPRES_Euro') {
             projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+        } else if (dataset == 'converge') {
+            projection.scale(1000).rotate([-15, 0, 0]).translate([width / 2 - 10, height / 2 + 850]);
+        }
             console.log(path);
 
             vis.selectAll('.map-path').attr('d', path);
@@ -258,7 +279,7 @@ FreqMap = function() {
             return currentDataset = dataset;
         } else {
             vis.selectAll('.map-path-50').remove();
-            projection.scale(120).translate([width / 2, height / 2]).rotate([-155, 0, 0]);
+            projection.scale(120).translate([width / 2, height / 2]).rotate([-15, 0, 0]);
             vis.selectAll('.map-path').attr('d', path);
             return currentDataset = dataset;
         }
@@ -275,6 +296,7 @@ FreqMap = function() {
             };
         })(this));
         country = country_raw[0];
+        console.log(country)
         b = path.bounds(country);
         s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
         t = [(width - s * (b[1][0] + b[0][0])) / 2, height - s * (b[1][1] + b[0][1])];

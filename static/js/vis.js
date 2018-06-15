@@ -147,43 +147,85 @@ FreqMap = function() {
                 });
             } else if (map_area == 'europe') {
 
-            // Clear border
-            base_layer.select('.world-border')
-                      .remove();
+                // Clear border
+                base_layer.select('.world-border')
+                          .remove();
 
-            // Map - rect
-            base_layer.append("rect")
-               .attr("x", 0)
-               .attr("y", 0)
-               .attr("width", width)
-               .attr("height", height)
-               .attr({
-                    "xlink:href": "#sphere",
-                    'fill': 'none',
-                    'stroke': '#000',
-                    'stroke-width': '5px',
-                    'stroke-location': 'inside'
-                })
-                .classed("map-path", true);
+                // Map - rect
+                base_layer.append("rect")
+                   .attr("x", 0)
+                   .attr("y", 0)
+                   .attr("width", width)
+                   .attr("height", height)
+                   .attr({
+                        "xlink:href": "#sphere",
+                        'fill': 'none',
+                        'stroke': '#000',
+                        'stroke-width': '5px',
+                        'stroke-location': 'inside'
+                    })
+                    .classed("map-path", true);
 
 
-                projection.scale(1000)
-                      .rotate([-15, 0, 0])
-                      .translate([width / 2 - 10, height / 2 + 850]);
+                    projection.scale(1000)
+                          .rotate([-15, 0, 0])
+                          .translate([width / 2 - 10, height / 2 + 850]);
 
-                        base_layer.selectAll('.map-path')
-                                  .attr('d', path);
+                            base_layer.selectAll('.map-path')
+                                      .attr('d', path);
 
-                        d3.json(base_url + '/static/data/world-50m.json', function(error, world) {
-                            countries = topojson.feature(world, world.objects.countries);
-                            base_layer.selectAll('.countries').attr('d', '');
-                            base_layer.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
-                                'd': path,
-                                'fill': '#aaa'
-                            });
+                            d3.json(base_url + '/static/data/world-50m.json', function(error, world) {
+                                countries = topojson.feature(world, world.objects.countries);
+                                base_layer.selectAll('.countries').attr('d', '');
+                                base_layer.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
+                                    'd': path,
+                                    'fill': '#aaa'
+                                });
 
-                        })
+                            })
 
+            } else if (map_area == 'china') {
+
+// Clear border
+                base_layer.select('.world-border')
+                          .remove();
+
+                // Map - rect
+                base_layer.append("rect")
+                   .attr("x", 0)
+                   .attr("y", 0)
+                   .attr("width", width)
+                   .attr("height", height)
+                   .attr({
+                        "xlink:href": "#sphere",
+                        'fill': 'none',
+                        'stroke': '#000',
+                        'stroke-width': '5px',
+                        'stroke-location': 'inside'
+                    })
+                    .classed("map-path", true);
+
+                    // [left, top], [right, bottom]
+                    b = [[93.8, 13.55], [136.8667,  53.45]]
+
+                    console.log(path.bounds(b));
+
+                    projection.scale(1000)
+                          .rotate([5, 0, 0])
+                          .center([((136.8667-93.8)/2) + 93.8, ((53.45 - 13.55)/2) + 13.55])
+
+                            base_layer.selectAll('.map-path')
+                                      .attr('d', path);
+
+                            d3.json(base_url + '/static/data/world-50m.json', function(error, world) {
+                                countries = topojson.feature(world, world.objects.countries);
+                                base_layer.selectAll('.countries').attr('d', '');
+                                base_layer.append('path').datum(topojson.feature(world, world.objects.land)).classed("map-path-50", true).attr({
+                                    'd': path,
+                                    'fill': '#aaa'
+                                });
+
+                            })
             }
     }
 
@@ -301,7 +343,7 @@ FreqMap = function() {
                             chr + ":" + comma(pos) + 
                             "</a>"
         rs_id = "";
-        if (variant_data) {
+        if (variant_data['name']) {
             rs_id = " - " + variant_data['name'] + " ";
         }
         $('#variant h2').html(ucsc_link + 
