@@ -1,0 +1,165 @@
+
+body{
+  font-family: 'Arvo', Georgia, Times, serif;
+  text-align: center;
+}
+
+h1{
+  font-size: 40px;
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 9px;
+  margin: 40px 0 20px;
+}
+
+#sub{
+  font-size: 28px;
+}
+
+#cc{
+  width: 60px;
+  height:auto;
+}
+
+.transSvg{
+  margin-top:20px;
+}
+
+#about{
+    margin-bottom:20px;
+}
+
+#about:hover{
+  cursor:pointer;
+}
+
+h2{
+  font-size: 28px
+}
+
+.modal-dialog{
+  margin-top: 195px;
+}
+
+.modal-body{
+  text-align: left;
+}
+
+#slider-holder{
+  margin-top: 30px;
+  margin-bottom: 0px;
+  margin-left: 20px;
+}
+
+#slider{
+  width:239px;
+  margin-bottom:5px;
+  float:left;
+  margin-left:327px;
+}
+
+#arrows{
+  float:left;
+}
+
+#submitArea{
+  margin-top: 20px;
+}
+
+#snp_col{
+  margin-top: 20px;
+}
+
+#vis {
+    /* 940w/ 500h */
+  width: 940px;
+  height: 500px;
+  clear: both;
+
+  display: block;
+  margin: auto;
+  /* margin-top:15px; JRT */
+}
+
+#datasets{
+  margin-top:5px;
+}
+
+#dataset{
+  width:240px;
+}
+
+#dataLink{
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+#search{
+  width:130px;
+  float:left;
+}
+
+#submit{
+  margin-left: 5px;
+}
+
+.twitter-share-button{
+  position: absolute;
+  right: 10px;
+  top: 20px;
+}
+
+#ucscLink:link{
+  color:black;
+}
+
+#ucscLink:visited {
+  color:black;
+}
+
+#ucscLink:hover{
+  cursor: pointer;
+  opacity: .6;
+  text-decoration:none;
+}
+
+#legend{
+  margin-top:30px;
+}
+
+footer{
+  font-size:10px;
+  margin-top: 40px;
+  width:100%;
+  margin-bottom:20px;
+}
+
+footer #text{
+  margin-top:30px;
+}
+
+.ui-slider .ui-slider-handle{
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #0e90d2;
+  background-image: -moz-linear-gradient(top, #149bdf, #0480be);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#149bdf), to(#0480be));
+  background-image: -webkit-linear-gradient(top, #149bdf, #0480be);
+  background-image: -o-linear-gradient(top, #149bdf, #0480be);
+  background-image: linear-gradient(to bottom, #149bdf, #0480be);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff149bdf', endColorstr='#ff0480be', GradientType=0);
+  -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+  opacity: 0.8;
+  border: 0px solid transparent;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  outline: none;
+}
+
+.igv-content-canvas {
+  position: static;
+}
