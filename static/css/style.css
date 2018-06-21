@@ -1,6 +1,9 @@
-
-body{
+body {
   font-family: 'Arvo', Georgia, Times, serif;
+  padding-top: 25px;
+}
+
+h1, #about, h2, h3, p {
   text-align: center;
 }
 
@@ -8,13 +11,8 @@ h1{
   font-size: 28px;
   border-bottom: 1px solid #eeeeee;
   padding-bottom: 4px;
-  margin: 10px 0 10px;
+  padding: 15px;
 }
-
-#error-modal{
-  text-align: center;
-}
-
 
 #sub{
   font-size: 15px;
@@ -46,7 +44,7 @@ h2{
 }
 
 .modal-body{
-  text-align: left;
+  text-align: center;
 }
 
 #slider-holder{
@@ -76,8 +74,8 @@ h2{
 
 #vis {
     /* 940w/ 500h */
-  width: 640px;
-  height: 455px;
+  width: 1170;
+  min-height: 600px;
   clear: both;
 
   display: block;
@@ -108,9 +106,7 @@ h2{
 }
 
 .twitter-share-button{
-  position: absolute;
-  right: 10px;
-  top: 20px;
+  float: right;
 }
 
 #ucscLink:link{
@@ -169,6 +165,21 @@ footer #text{
   position: static;
 }
 
+.node {
+  z-index: 10000;
+}
+.map-path-50 {
+  z-index: -10000;
+}
+
+#legend #freqLegend, #legend #transLegend {
+  text-align: center;
+}
+
 #msg-alert {
   display: none;
+}
+
+#footer {
+  text-align: center;
 }
