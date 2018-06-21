@@ -1,7 +1,5 @@
 *.swp
 *.swo
-*.pyc
-datasets/
 .sass-cache
 .local
 *.DS_Store
