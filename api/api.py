@@ -101,9 +101,7 @@ def _random_line(file_name):
             if variant:
                 app.logger.info(variant)
                 variant = variant.splitlines()[0]
-                break
-
-     return variant
+                return variant
 
 def _random_line(file_name):
     """
