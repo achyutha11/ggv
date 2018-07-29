@@ -75,48 +75,48 @@ def _load_population_coords(dataset):
     return coords
 
 
-def _random_line(file_name):
-    """
-        Reads a random line from a gzip file.
-    """
-    # Get filesize
-    try:
-        bedtools_path = YAML_CONFIG['bedtools_path']
-    except KeyError:
-        bedtools_path = 'bedtools'
-
-    try:
-        tabix_path = YAML_CONFIG['tabix_path']
-    except KeyError:
-        tabix_path = 'tabix'
-
-    variant = None
-    while variant is None:
-        for line in Popen([bedtools_path, 'random', '-g', 'hg19.genome', '-n', '100', '-l', '10000'], stdout=PIPE, stderr=PIPE).stdout:
-            app.logger.info(line)
-            chrom, start, end = line.split("\t")[:3]
-            app.logger.info(chrom, start, end)
-            comm = [tabix_path, file_name, "%s:%s-%s" % (chrom, start, end)]
-            variant, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
-            if variant:
-                app.logger.info(variant)
-                variant = variant.splitlines()[0]
-                return variant
-
 # def _random_line(file_name):
 #     """
 #         Reads a random line from a gzip file.
 #     """
 #     # Get filesize
 #     try:
-#         grabix = YAML_CONFIG['grabix_path']
+#         bedtools_path = YAML_CONFIG['bedtools_path']
 #     except KeyError:
-#         grabix = 'grabix'
-#     grabix_command = [grabix, 'random', file_name, '1']
-#     app.logger.info(' '.join(map(str,grabix_command)))
-#     line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
-#     app.logger.info(err)
-#     return line
+#         bedtools_path = 'bedtools'
+
+#     try:
+#         tabix_path = YAML_CONFIG['tabix_path']
+#     except KeyError:
+#         tabix_path = 'tabix'
+
+#     variant = None
+#     while variant is None:
+#         for line in Popen([bedtools_path, 'random', '-g', 'hg19.genome', '-n', '100', '-l', '10000'], stdout=PIPE, stderr=PIPE).stdout:
+#             app.logger.info(line)
+#             chrom, start, end = line.split("\t")[:3]
+#             app.logger.info(chrom, start, end)
+#             comm = [tabix_path, file_name, "%s:%s-%s" % (chrom, start, end)]
+#             variant, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
+#             if variant:
+#                 app.logger.info(variant)
+#                 variant = variant.splitlines()[0]
+#                 return variant
+
+def _random_line(file_name):
+    """
+        Reads a random line from a gzip file.
+    """
+    # Get filesize
+    try:
+        grabix = YAML_CONFIG['grabix_path']
+    except KeyError:
+        grabix = 'grabix'
+    grabix_command = [grabix, 'random', file_name, '1']
+    app.logger.info(' '.join(map(str,grabix_command)))
+    line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
+    app.logger.info(err)
+    return line
 
 
 def _define_freqscale(freq):
