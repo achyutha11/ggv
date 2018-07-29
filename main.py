@@ -55,7 +55,7 @@ from ggv.authentication import login_required
 def index(dataset = "", loc = ""):
     try:
         username = session['username']
-    except (KeyError, TypeError):
+    except (KeyError):
         loc = None
     base_url = YAML_CONFIG['base_url']
     datasets = {}
