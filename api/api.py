@@ -103,20 +103,20 @@ def _random_line(file_name):
                 variant = variant.splitlines()[0]
                 return variant
 
-def _random_line(file_name):
-    """
-        Reads a random line from a gzip file.
-    """
-    # Get filesize
-    try:
-        grabix = YAML_CONFIG['grabix_path']
-    except KeyError:
-        grabix = 'grabix'
-    grabix_command = [grabix, 'random', file_name, '1']
-    app.logger.info(' '.join(map(str,grabix_command)))
-    line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
-    app.logger.info(err)
-    return line
+# def _random_line(file_name):
+#     """
+#         Reads a random line from a gzip file.
+#     """
+#     # Get filesize
+#     try:
+#         grabix = YAML_CONFIG['grabix_path']
+#     except KeyError:
+#         grabix = 'grabix'
+#     grabix_command = [grabix, 'random', file_name, '1']
+#     app.logger.info(' '.join(map(str,grabix_command)))
+#     line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
+#     app.logger.info(err)
+#     return line
 
 
 def _define_freqscale(freq):
