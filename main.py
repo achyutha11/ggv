@@ -5,7 +5,7 @@ import os
 import re
 import json
 import logging
-
+from logzero import logger
 from flask import (Flask,
                    send_from_directory,
                    Response,
@@ -74,6 +74,7 @@ def index(dataset = "", loc = ""):
 
 @app.route("/welcome")
 def welcome_login_page():
+    logger.info("Welcome")
     return render_template('login.html', **locals())
 
 
