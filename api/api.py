@@ -93,13 +93,13 @@ def _random_line(file_name):
     variant = None
     while variant is None:
         for line in Popen([bedtools_path, 'random', '-g', 'hg19.genome', '-n', '100', '-l', '10000'], stdout=PIPE, stderr=PIPE).stdout:
-            logger.info(line)
+            app.logger.info(line)
             chrom, start, end = line.split("\t")[:3]
-            logger.info(chrom, start, end)
+            app.logger.info(chrom, start, end)
             comm = [tabix_path, file_name, "%s:%s-%s" % (chrom, start, end)]
             variant, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
             if variant:
-                logger.info(variant)
+                app.logger.info(variant)
                 variant = variant.splitlines()[0]
                 break
 
