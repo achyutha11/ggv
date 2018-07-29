@@ -4,6 +4,7 @@ import random
 import gzip
 import requests
 import math
+from logzero import logger
 from ggv.main import app, datasets, base_path, HERE, YAML_CONFIG, session
 from ggv.util.fn import autoconvert
 from subprocess import Popen, PIPE
@@ -80,14 +81,27 @@ def _random_line(file_name):
     """
     # Get filesize
     try:
-        grabix = YAML_CONFIG['grabix_path']
+        bedtools_path = YAML_CONFIG['bedtools_path']
     except KeyError:
-        grabix = 'grabix'
-    grabix_command = [grabix, 'random', file_name, '1']
-    app.logger.info(' '.join(map(str,grabix_command)))
-    line, err = Popen(grabix_command, stdout=PIPE, stderr=PIPE).communicate()
-    app.logger.info(err)
-    return line
+        bedtools_path = 'bedtools'
+
+    try:
+        tabix_path = YAML_CONFIG['tabix_path']
+    except KeyError:
+        tabix_path = 'tabix'
+
+    variant = None
+    while variant is None:
+        for line in Popen([bedtools_path, 'random', '-g', 'hg19.genome', '-n', '100', '-l', '10000'], stdout=PIPE, stderr=PIPE).stdout:
+            chrom, start, end = line.split("\t")[:3]
+            logger.info(chrom, start, end)
+            comm = [tabix_path, file_name, "%s:%s-%s" % (chrom, start, end)]
+            variant, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
+            if variant:
+                variant = variant.splitlines()[0]
+                break
+
+    return variant
 
 
 def _define_freqscale(freq):
@@ -134,7 +148,7 @@ def fetch_variant(dataset, query):
 
     # Log request
     with open(HERE + "/access.log", 'a') as f:
-        logline = [session['username'], 
+        logline = [session['username'],
                    session['service'],
                    'fetch_variant',
                    dataset,
@@ -190,7 +204,6 @@ def fetch_variant(dataset, query):
         response = {}
         line = line.strip().split()
         chrom, pos, rsID, pop, ref, alt, n_obs, x_obs, freq = map(autoconvert, line)[0:11]
-        app.logger.info(freq)
 
         if verify_rs:
             if query != rsID:
@@ -253,14 +266,14 @@ def fetch_variant(dataset, query):
 @login_required
 def api_tabix_request(dataset, region):
     """
-        Outputs raw tabix data; 
-        Optionally use 'dl' at end 
+        Outputs raw tabix data;
+        Optionally use 'dl' at end
         to download tsv.
     """
 
     # Log request
     with open(HERE + "/access.log", 'a') as f:
-        logline = [session['username'], 
+        logline = [session['username'],
                    session['service'],
                    'tabix_request',
                    dataset,
