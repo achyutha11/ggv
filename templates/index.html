@@ -1,0 +1,275 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>GGV</title>
+    <link rel="icon" href="{{ url_for('static', filename='/css/map.ico') }}">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tipsy.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <base href="{{ base_url }}">
+</head>
+<body>
+    <div class="container" id='all'>
+        <div id="main" class = 'row' role="main">
+            <div class='col-md-12'>
+                <div class='pull-left'>{{ username }}<br /><a href='{{ url_for('logout') }}'>logout</a></div>
+
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+                <h1>Geography of Genetic Variants Browser</h1>
+                <a data-toggle="modal" data-target="#myModal" id='about'><p id='about'>About / Help</a></p>
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class='alert alert-danger' id='msg-alert' role='alert'>
+                            <i class='fa fa-exclamation-triangle' aria-hidden='true'></i>
+                            <span class='sr-only'>Error:</span>
+                            <span id='msg-alert-error'></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">About</h4>
+                            </div>
+                            <div class="modal-body">
+                                Welcome to the Geography of Genetic Variants (GGV)
+                                browser! <br><br> To begin, pick a dataset on the
+                                dropdown menu. One can search variants within a dataset
+                                by its rsID or position (Use the format
+                                chromosome#:position, as in, 15:24608502 or
+                                chr15:24608502) and clicking the search button or the
+                                enter key.  Click the "random" button to show a random
+                                marker from the chosen dataset.<br><br>
+                                The embedded
+                                IGV browser at the bottom of the page can also also be
+                                used to pick a variant for display.  <br> <br>
+                                To
+                                display the population name, minor allele frequency,
+                                minor allele count, and sample size, hover with the
+                                mouse over a data point. Click on the plot title to open
+                                up the UCSC genome browser at that variant.
+                                <br><br>Be sure to note we use a notion of a "frequency scale" to display rare variants and a "transparency scale" to indicate uncertain allele frequencies.  These are explained in the legend.
+                                <br><br>
+                                If you use the maps in other works, include the source link: <a href="https://www.popgen.uchicago.edu/ggv/">https://www.popgen.uchicago.edu/ggv</a>
+                                and/or make a formal reference to:<br>
+                                Marcus &amp; Novembre (2016) Visualizing the Geography of Genetic Variants.  <it>Bioinformatics</it><a href="https://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"><i id='linkIcon' class='fa fa-external-link'></i>.</a>
+                                <br><br>Keep in mind that this
+                                is still an evolving project and many ideas/resources are in progress.
+                                <br><br> Questions/feedback/ideas/critiques are welcomed and appreciated! <br>Contact: josephhmarcus at gmail dot com or jnovembre at uchicago dot edu.
+                                <br><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="browser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">IGV Genome Browser Help</h4>
+                            </div>
+                            <div class="modal-body">
+                                To use the embedded IGV Browser, input the number of the chromosome you would like to look at in the search box and hit enter. You can zoom in/out on the chromosome by clicking on the +/- buttons on the right side of the browser. You can zoom in on a specific section of the chromosome by clicking and dragging along the axis.
+                                <br><br>
+                                To move about the chromosome, you can use the arrow keys to move left or right. You can also click and drag on the genes and variants sections if you would like to make smaller movements. To jump to another section of the chromosome, you can click on areas you would like to look at on the upper chromosome display, and the red window will move there.
+                                <br><br>
+                                If you click on a variant (vertical grey bar) in the variants section, then that variant will be displayed on the map above. Also, if you search for a variant in the upper search box by the map, the browser will switch to the variant's chromosome and zoom into that variant's location along the chromosome.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-list-ol"></i></h4>
+                            </div>
+                            <div class="modal-body">
+                                <form id='snpArea'>
+                                    copy paste a single column of snps <i class="fa fa-long-arrow-down"></i>. Remeber to select the appropriate dataset!
+                                    <textarea id='snp_col' class="form-control" rows="3" type="text"></textarea>
+                                    <button id='submitArea' type="button" class="btn btn-default">submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class='row' id='settings'>
+            <div class='col-sm-4'>
+                <select id='dataset' class="form-control" style='width: 80%; display: inline;'>
+                    {% for k, v in datasets.items() %}
+                        <option {% if k == dataset %}selected{% endif %} value='{{ k }}' data-url='{{ v.url }}'>{{ v.label }}</option>
+                    {% endfor %}
+                </select>
+                <a id='dataset-url'><span class='fa fa-external-link'></span></a>
+            </div>
+            <div class='col-sm-5'>
+                <div id='variant_settings'>
+                    <div class='text-center'>
+                        <form id='buttons' class='btn-group' onSubmit="return false;">
+                            <input id='search' type="text" class="form-control" placeholder='rsID/chr#:pos'>
+                            <button id='submit' type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            <button id='random' type='button' class="btn btn-default">random</button>
+                            <button id='upload' type='button' class="btn btn-default" data-toggle="modal" data-target="#upload"><i class="fa fa-list-ol"></i></button>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div id="layouts" class='col-sm-3'>
+                <div style='text-align: right'>
+                    Avoid overlap:
+                    <div class='btn-group'>
+                        <a id="true" class="btn btn-default">Off</a>
+                        <a id="charged" class="btn btn-default">On</a>
+                    </div>
+                </div>
+            </div>
+            <div class='col-sm-6' id='slider-holder'>
+                <div id="slider"></div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div class="modal fade" id="alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle"></i></h4>
+                </div>
+                <div class="modal-body">
+                    Either the SNP you searched is not in the chosen dataset or the search term is formatted incorrectly. <br><br>
+                    When using the query box, acceptable searches by chromosome/pos or rsID look like...<br><br>
+                    <li>chr1:742429</li>
+                    <br>
+                    <li>1:742429</li>
+                    <br>
+                    <li>rs3094315</li>
+                    <br>
+                    When using a url-based query, acceptable searches look like: <br><br>
+                    
+                    <li> Query default data (1000 Genomes phase 3) by chromosome and position:<br>
+                        <a href='https://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'>'https://popgen.uchicago.edu/ggv/?chr=10&pos=114900524'</a></li>
+                        <br>
+                        <li> Query default data by rsid:<br>
+                            <a href='https://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'>'https://popgen.uchicago.edu/ggv/?data=1000genomes"&rsid=rs1799983'</a></li>
+                            <br>
+                            <li> Query default data for a random SNP<br>
+                                <a href='https://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'>'https://popgen.uchicago.edu/ggv/?data="1000genomes"&random_snp=True'</a></li>
+                                <br>
+                                <li> Query an alternate dataset:<br>
+                                    <a href='https://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'>'https://popgen.uchicago.edu/ggv/?data="1000genomes_superpops"&chr=12&pos=11957847'</a></li>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="row">
+                            <div class='col-md-12'>
+                                <div id='variant'><h2></h2></div>
+                                <div id="vis"></div>
+                            </div>
+                            <div class='col-md-12', id='legend'>
+                                <div id='freqLegend' class="col-md-4">
+                                    <h3></h3>
+                                    <p></p>
+                                </div>
+                                
+                                <div id='transLegend' class="col-md-4">
+                                    <h3></h3>
+                                    <p></p>
+                                </div>
+                                
+                                <div id='testLegend' class="col-md-4">
+                                    <p style='font-size: 12px;'>Marcus &amp; Novembre (2016) Visualizing the Geography of Genetic Variants.  <em>Bioinformatics</em><a href="http://bioinformatics.oxfordjournals.org/content/early/2016/10/14/bioinformatics.btw643.abstract"> <i id="linkIcon" class="fa fa-external-link"></i></a></p><p style='font-size: 12px;'>Funding provided by <a href="https://datascience.nih.gov/bd2k">NIH BD2K Program.</a></p>
+                                    <h3></h3>
+                                    <p></p>
+                                    <div class="btn-group" style='width: 100%'>
+                                        <a id="pdf" class="btn btn-block btn-default">Save Plot As PDF</a>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- <div id="scales">
+                                <h3></h3>
+                                <a data-toggle="modal" data-target="#browser"><p>Help</p></a>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div>
+                        <!-- <h3>Variants Browser</h3> removed JRT 10-14-16 -->
+                        <div id="browserContainer">
+                        </div>
+                        <a data-toggle="modal" data-target="#browser"><p>IGV Browser Help</p></a>
+                    </div>
+                </div>
+                <footer id='footer'>
+                    <div id='text'>
+                        <p><a href='https://jnpopgen.org/' target='_blank'>Novembre Lab</a><br>Developed by Joe Marcus and John Novembre with Jeff Tharsen and Alex Mueller<br>Department of Human Genetics, University of Chicago</p>
+                        <p>Version: 0.5 (beta)</p>
+                        <a href="https://creativecommons.org/licenses/by/4.0/" target='_blank'><i class="fa fa-cc fa-2x"></i></a>
+                    </div>
+                </footer>
+                <!-- jQuery UI CSS -->
+                <link rel="stylesheet" type="text/css"
+                    href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"/>
+                    <!-- Font Awesome CSS -->
+                    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+                    <!-- IGV CSS -->
+                    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/igv/igv-1.0.9.css') }}">
+                    <!-- jQuery JS -->
+                    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+                    <!-- IGV JS-->
+                    <script type="text/javascript" src="{{ url_for('static', filename='js/igv/igv-1.0.9.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/jquery.tipsy.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/d3.geo.projection.v0.min.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/topojson.v1.min.js') }}"></script>
+                    <script src="{{ url_for('static', filename='js/jQuery-File-Upload-9.7.1/js/jquery.iframe-transport.js') }}"></script>
+                    <script type="text/javascript" src="{{ url_for('static', filename='js/blob-stream.js') }}"></script>
+                    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+                    <script type="text/javascript" src="{{ url_for('static', filename='js/pdfkit.js')  }}"></script>
+                    <script>
+                    {# DATASETS #}
+                    _datasets = {{ datasets|tojson }}
+                    init_dataset = {{ dataset|tojson }};
+                    init_loc = {{ loc|tojson }};
+                    base_url = {{ base_url|tojson }}
+                    </script>
+                    <script type="text/javascript" src="{{ url_for('static', filename='js/vis.js') }}"></script>
+                    <script>
+                    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                    ga('create', 'UA-52770606-1', 'auto');
+                    ga('send', 'pageview');
+                    </script>
+                    <!--[if lt IE 7 ]>
+                    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+                    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+                    <![endif]-->
+                </body>
+            </html>
