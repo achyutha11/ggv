@@ -26,14 +26,14 @@
                 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
                 <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
                 <h1>Geography of Genetic Variants Browser</h1>
-                
-                <p>Explanation here on why oauth req'd</p>
+
+                <p>This edition of GGV includes the PAGE data and other datasets.  Following guidelines from the groups sharing these data, we are requiring Oauth authentification and have limits on the number of queries.</p>
 
                 <p>Please Login</p>
             </div>
 
                 <div class='row'>
-                    <div class='col-md-4 col-sm-12 col-md-offset-4'>
+                    <div class='col-md-4 col-sm-12 col-md-offset-4 text-center'>
                             <div class="btn-group">
                                 <a href='{{ url_for('login', auth="google") }}' type="button" class="btn btn-default"><i class="fa fa-google" aria-hidden="true"></i> Login with Google</a>
                                 <a href='{{ url_for('login', auth="twitter") }}'  type="button" class="btn btn-default"><i class="fa fa-twitter" aria-hidden="true"></i> Login with Twitter</a>
