@@ -5,6 +5,7 @@ import gzip
 import requests
 import math
 import numpy as np
+import pandas as pd
 from scipy.stats import pearsonr
 from logzero import logger
 from ggv.main import app, datasets, base_path, HERE, YAML_CONFIG, session
@@ -37,6 +38,59 @@ def ld_to_json(ld_matrix):
     response_json = {'ld_mat': lower_tri}
 
     return jsonify(response_json)
+
+# config = {"emeraLD_path" : '/scratch/midway2/abiddanda/geo_LD_viz_v2/bin/emeraLD/bin/emeraLD'}
+
+def _get_local_ld(path, chrom, pos, window_size=100000):
+  """
+  Obtain the local LD-matrix containing snps around a position
+  Arguments:
+    path: path to the VCF file
+    chrom: the chromosome (currently as a string)
+    pos: position as an integer
+    window_size: size of surrounding window centered on pos
+      NOTE:  raise a warning box if window_size > 1 Mb?
+
+  TODO: draft function by Arjun (need to jsonify later)  
+  """
+  emerald = YAML_CONFIG["emeraLD_path"]
+  start = int(pos - window_size/2)
+  end = int(pos + window_size/2)
+  region = "%s:%d-%d" % (chrom, start, end)
+  comm = [emerald, "-i", path, "--region", region, "--matrix", "--extra", "--stdout"]
+  # Actually run the shell command
+  ld_mat, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
+  # Generate a dataframe from the string
+  ld_df = pd.read_table(StringIO(ld_mat.decode('utf-8')), header=None).values
+  # Return the snp information and lower-tri LD matrix
+  snp_info = ld_df[:,:4]
+  ld_mat = ld_df[:,4:].astype(np.float32)
+  ld_mat = np.tril(ld_mat**2)
+  return(snp_info, ld_mat)
+
+
+def _calc_ld_score(path, chrom, pos, window_size=1e6):
+  """
+    Calculate the LD-score of a variant as the sum of empirical R^2
+    Arguments:
+      path: path to VCF file
+      chrom: chromosome (currently string)
+      pos: basepair position
+      window_size: window to compute LD-score in
+  TODO: draft function by Arjun (need to jsonify later)  
+  """
+  emerald = YAML_CONFIG["emeraLD_path"]
+  start = int(pos - window_size)
+  end = int(pos + window_size)
+  region = "%s:%d-%d" % (chrom, start, end)
+  snp = "%s:%d" % (chrom, pos)
+  comm = [emerald, "-i", path, "--region", region, "--snp", snp, "--stdout"]
+  # Actually run the shell command!
+  out, err = Popen(comm, stdout=PIPE, stderr=PIPE).communicate()
+  # NOTE: this doesn't actually calculate the full LD-score!
+  ld_df = pd.read_table(StringIO(out.decode('utf-8')), header=None).values
+  ld_score = np.sum(ld_df[1:,4].astype(np.float32))
+  return(ld_df, ld_score)
 
 
 
