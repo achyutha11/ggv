@@ -16,6 +16,8 @@ from Bio import bgzf
 from ggv.authentication import login_required
 from flask import session, g
 from datetime import datetime
+from cyvcf2 import VCF
+from scipy.stats import pearsonr
 
 
 # Write function to convert LD numpy matrix to lower triangular 
@@ -91,6 +93,27 @@ def _calc_ld_score(path, chrom, pos, window_size=1e6):
   ld_df = pd.read_table(StringIO(out.decode('utf-8')), header=None).values
   ld_score = np.sum(ld_df[1:,4].astype(np.float32))
   return(ld_df, ld_score)
+
+def pairwise_ld(path, chrom, pos1, pos2):
+  """Compute the pairwise LD using cyvf2
+
+     NOTE: This adds an extra dependency
+     ALTERNATIVE: use vanilla tabix and post-process genotype vectors  
+  """ 
+  vcf = VCF(path, gts012=True, lazy=True)
+  region1 = "%s:%d-%d" % (chrom, pos1, pos1+1)
+  region2 = "%s:%d-%d" % (chrom, pos2, pos2+1)
+  paired_geno = []
+  for r in [region1, region2]:
+    for v in vcf(r):
+      paired_geno.append(v.gt_types)
+  # Check that we have two variants here 
+  assert(len(paired_geno) == 2)
+  # Compute the pearson r^2
+  r = pearsonr(paired_geno[0], paired_geno[1])[0]
+  return(r, r**2)
+
+
 
 
 
