@@ -35,9 +35,9 @@ def ld_to_json(ld_matrix):
     assert ld_matrix.shape == (n, n)
     lower_tri = np.tril(ld_matrix)
     
-    response_json = {'ld_mat': lower_tri}
+    response_json = {'ld_mat': json.dumps(lower_tri.tolist())}
 
-    return jsonify(response_json)
+    return response_json
 
 # config = {"emeraLD_path" : '/scratch/midway2/abiddanda/geo_LD_viz_v2/bin/emeraLD/bin/emeraLD'}
 
