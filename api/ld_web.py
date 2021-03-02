@@ -47,7 +47,7 @@ def handle_invalid_usage(error):
 def base_func():
     return ""
 
-def ld_to_json(ld_matrix):
+def _ld_to_json(ld_matrix):
     """
     Convert a numpy LD matrix to desired format.
 
@@ -74,9 +74,10 @@ def _get_local_ld(path, chrom, pos, window_size=100000):
     pos: position as an integer
     window_size: size of surrounding window centered on pos
       NOTE:  raise a warning box if window_size > 1 Mb?
-
-  TODO: draft function by Arjun (need to jsonify later)  
+ 
   """
+  if window_size > 2e6:
+    raise NotImplementedError('Window-Size is too large!')
   emerald = YAML_CONFIG["emeraLD_path"]
   start = int(pos - window_size/2)
   end = int(pos + window_size/2)
@@ -88,9 +89,16 @@ def _get_local_ld(path, chrom, pos, window_size=100000):
   ld_df = pd.read_table(StringIO(ld_mat.decode('utf-8')), header=None).values
   # Return the snp information and lower-tri LD matrix
   snp_info = ld_df[:,:4]
+  snp_info = pd.DataFrame(snp_info, columns=['chrom','pos','snp','alleles'])
+  snp_info2 = {'chrom': snp_info['chrom'].values.tolist(),
+              'pos': snp_info['pos'].values.tolist(),
+              'snp': snp_info['snp'].values.tolist(),
+              'alleles': snp_info['alleles'].values.tolist()}
   ld_mat = ld_df[:,4:].astype(np.float32)
   ld_mat = np.tril(ld_mat**2)
-  return(snp_info, ld_mat)
+  ld_json = _ld_to_json(ld_mat)
+  response = {**snp_info2, **ld_json}
+  return(response)
 
 
 def _calc_ld_score(path, chrom, pos, window_size=1e6):
@@ -114,7 +122,8 @@ def _calc_ld_score(path, chrom, pos, window_size=1e6):
   # NOTE: this doesn't actually calculate the full LD-score!
   ld_df = pd.read_table(StringIO(out.decode('utf-8')), header=None).values
   ld_score = np.sum(ld_df[1:,4].astype(np.float32))
-  return(ld_df, ld_score)
+  query_response = {'ldscore': json.dumps(ld_score.item())}
+  return(query_response)
 
 def _pairwise_ld(path, chrom, pos1, pos2):
   """Compute the pairwise LD using cyvf2
@@ -194,30 +203,29 @@ def fetch_ld(dataset, pop, query):
                 # Check if the chromosome matches after resolving rsID
                 assert(rs_chrom == str(chrom))
                 # NOTE : need some way to generate json for the snp-information too!
-                snp_info, ld_mat = _get_local_ld(data_file_path, rs_chrom, int(rs_pos), window_size=window_size)  
-                query_response = ld_to_json(ld_mat)
+                query_response = _get_local_ld(data_file_path, rs_chrom, int(rs_pos), window_size=window_size)  
             else:
                 # treat the id as the position now... 
-                pos = int(id1)
-                snp_info, ld_mat = _get_local_ld(data_file_path, chrom, pos, window_size=window_size)
-                query_response = ld_to_json(ld_mat) 
+                pos = int(id1) 
+                query_response = _get_local_ld(data_file_path, chrom, pos, window_size=window_size) 
         elif id2.startswith("ld"):
             # Case 2: calculate the LD-score
             window_size = int(id2[2:])
             if id1.startswith("rs"):
-                chrom_pos = _resolve_rsid(id1)
+                rsinfo = _resolve_rsid(id1)
+                rs_chrom = rsinfo['region'].split(':')[0]
+                rs_pos = rsinfo['region'].split(":")[1].split('-')[0]
                 # Check if the chromosome matches after resolving rsID
-                assert(chrom_pos['seq_region_name'] == str(chrom))
-                pos = int(chrom_pos['end'])
-                snp_info, ldscore = _calc_ld_score(data_file_path, chrom, pos, window_size=window_size)
+                assert(rs_chrom == str(chrom))
+                query_response = _calc_ld_score(data_file_path, chrom, int(rs_pos), window_size=window_size)
             else:
                 pos = int(id1)
-                snp_info, ldscore = _calc_ld_score(data_file_path, chrom, pos, window_size=window_size)
-                
+                query_response = _calc_ld_score(data_file_path, chrom, pos, window_size=window_size)
         else:
             raise NotImplementedError('This query is not implemented yet!')
         response = {
             "dataset": dataset,
+            "pop": pop,
             "query": {
                 "raw": query,
                 "chr": chrom,
@@ -225,6 +233,8 @@ def fetch_ld(dataset, pop, query):
                 "id2": id2
                 }
             }
+        response = {**response, **query_response}
+        print(response)
         return jsonify(response)
     except Exception as e:
         response = jsonify({'message': "Improper orientation", 
