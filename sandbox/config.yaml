@@ -1,0 +1,14 @@
+base_url: '/dev-integrated'
+base_path: '/datasets'
+emeraLD_path: '/scratch/midway2/abiddanda/geo_LD_viz_v2/bin/emeraLD/bin/emeraLD'
+ld_datasets:
+  1KGsuperpops:
+    label: "1000 Genomes"
+    base_path: "/scratch/midway2/abiddanda/geo_LD_viz_v2/sandbox/data/"
+    chromosomes:
+      22:
+        AFR: "AFR.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.biallelic_snps.vcf.gz"
+        AMR: "AMR.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.biallelic_snps.vcf.gz"
+        EUR: "EUR.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.biallelic_snps.vcf.gz"
+        EAS: "EAS.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.biallelic_snps.vcf.gz"
+        SAS: "SAS.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.biallelic_snps.vcf.gz"
